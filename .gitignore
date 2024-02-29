@@ -1,0 +1,23 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/trenings-app-frontend/node_modules
+/trenings-app-frontend/.pnp
+/trenings-app-frontend/.pnp.js
+
+# testing
+/trenings-app-frontend/coverage
+
+# production
+/trenings-app-frontend/build
+
+# misc
+/trenings-app-frontend/.DS_Store
+/trenings-app-frontend/.env.local
+/trenings-app-frontend/.env.development.local
+/trenings-app-frontend/.env.test.local
+/trenings-app-frontend/.env.production.local
+
+/trenings-app-frontend/npm-debug.log*
+/trenings-app-frontend/yarn-debug.log*
+/trenings-app-frontend/yarn-error.log*
