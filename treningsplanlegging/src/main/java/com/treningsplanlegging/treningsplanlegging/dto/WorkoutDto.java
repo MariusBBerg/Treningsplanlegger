@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class WorkoutDto {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private Date date;
     private String description;
     private Double distance; // Valgfritt, for løping

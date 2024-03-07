@@ -10,6 +10,7 @@ import com.treningsplanlegging.treningsplanlegging.dto.WorkoutDto;
 import com.treningsplanlegging.treningsplanlegging.entity.User;
 import com.treningsplanlegging.treningsplanlegging.entity.Workout;
 import com.treningsplanlegging.treningsplanlegging.repository.WorkoutRepository;
+import java.util.List;
 
 @Service
 public class WorkoutService {
@@ -33,5 +34,9 @@ public class WorkoutService {
         }
     
         return workoutRepository.save(workout);
+    }
+
+    public List<Workout> findAllWorkoutsForUser(Long userId) {
+        return workoutRepository.findByUserId(userId);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/workouts")
@@ -39,4 +40,21 @@ public class WorkoutController {
         Workout newWorkout = workoutService.addWorkout(workoutDto, user);
         return ResponseEntity.ok(newWorkout);
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Workout>> getAllWorkoutsForAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String login = authentication.getName(); // Henter brukernavn fra autentiseringsobjektet
+        User user = userRepository.findByLogin(login)
+                                  .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
+        
+        List<Workout> workouts = workoutService.findAllWorkoutsForUser(user.getId());
+        return ResponseEntity.ok(workouts);
+    }
+    
+
 }
+

@@ -1,5 +1,5 @@
 // src/components/WorkoutForm.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Calendar, momentLocalizer } from "react-big-calendar"; // Importer Calendar
@@ -11,14 +11,39 @@ const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
 const WorkoutForm = () => {
   const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
   const [distance, setDistance] = useState(""); // Bare relevant for løping
   const [duration, setDuration] = useState(""); // Bare relevant for løping
   const [zone, setZone] = useState(""); // Bare relevant for løping
 
+  const [workouts, setWorkouts] = useState([]);
+  const [selectedWorkout, setSelectedWorkout] = useState(null); // Legg til denne linjen
 
-  const [openModal, setOpenModal] = useState(false);
+  const fetchWorkouts = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/workouts/user/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      setWorkouts(response.data); // Anta at response.data er en array av treningsøkter
+    } catch (error) {
+      console.error("Det oppstod en feil ved henting av treningsøkter", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWorkouts();
+  }, []);
+
+  const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(false);
+  const [openViewWorkoutModal, setOpenViewWorkoutModal] = useState(false);
+
   const navigate = useNavigate();
 
   const userStr = localStorage.getItem("user");
@@ -37,16 +62,16 @@ const WorkoutForm = () => {
     const durationInSeconds =
       type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
 
+    const dateTime = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm').toISOString();
+
     const workoutData = {
-      date: formatDate(date),
+      date: dateTime,
       description,
       type,
       distance: type === "Løping" ? parseFloat(distance) : undefined,
       durationSeconds: durationInSeconds, // Bruk den konverterte varigheten i sekunder
       intensityZone: type === "Løping" ? parseInt(zone, 10) : undefined,
     };
-
-    console.log(workoutData);
 
     try {
       await axios.post("http://localhost:8080/api/workouts", workoutData, {
@@ -55,20 +80,38 @@ const WorkoutForm = () => {
         },
       });
       //navigate("/dashboard"); // Naviger brukeren til dashboard etter suksessfull innsending
-      setOpenModal(false);
+      setOpenAddWorkoutModal(false);
+      fetchWorkouts();
     } catch (error) {
       console.error("Det oppstod en feil ved innsending av treningsøkt", error);
     }
   };
 
   const formatDate = (date) => {
-    const d = new Date(date),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    return [year, month.padStart(2, "0"), day.padStart(2, "0")].join("-");
+    return moment(date).format("YYYY-MM-DD HH:mm");
   };
+
+  const calendarEvents = workouts.map((workout) => {
+    // Konverter startdatoen til et moment-objekt for enklere håndtering.
+    const startMoment = moment(workout.date);
+  
+    // Bestem sluttidspunktet ved å legge til `durationSeconds` eller, som standard, 3600 sekunder (1 time).
+    const endMoment = workout.durationSeconds
+      ? startMoment.clone().add(workout.durationSeconds, 'seconds')
+      : startMoment.clone().add(1, 'hours'); // Legger til 1 time som standard hvis `durationSeconds` er null.
+  
+    return {
+      start: startMoment.toDate(),
+      end: endMoment.toDate(),
+      title: workout.description,
+      type: workout.type,
+      duration: workout.durationSeconds ? workout.durationSeconds / 60 : 60, // Konverter sekunder til minutter eller bruk 60 minutter som standard.
+      distance: workout.distance,
+      intensity: workout.intensityZone,
+      notes: workout.description,
+    };
+  });
+  
 
   return (
     <div>
@@ -77,16 +120,26 @@ const WorkoutForm = () => {
         localizer={localizer}
         defaultDate={new Date()}
         defaultView="month"
-        events={[]}
+        events={calendarEvents} // Bruk den formaterte listen av treningsøkter her
         style={{ height: "500px" }}
         selectable={true}
         onSelectSlot={({ start }) => {
-          setDate(start);
-          setOpenModal(true);
+          const formattedDate = moment(start).format('YYYY-MM-DD');
+          const formattedTime = moment(start).format('HH:mm');
+          setDate(formattedDate);
+          setTime(formattedTime);
+          setOpenAddWorkoutModal(true);
+        }}
+        onSelectEvent={(event) => {
+          setSelectedWorkout(event);
+          setOpenViewWorkoutModal(true); // Åpne modalen for å vise en eksisterende treningsøkt
         }}
       />
 
-      <Modal show={openModal} onClose={() => setOpenModal(false)}>
+      <Modal
+        show={openAddWorkoutModal}
+        onClose={() => setOpenAddWorkoutModal(false)}
+      >
         <Modal.Header>Add Workout</Modal.Header>
         <Modal.Body>
           <div className="space-y-6">
@@ -108,40 +161,40 @@ const WorkoutForm = () => {
               </div>
               {type === "Løping" && (
                 <>
-                  <div class="max-w-sm py-2">
+                  <div className="max-w-sm py-2">
                     <label
                       htmlFor="distance"
-                      class="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
                       Distanse (km):
                     </label>
                     <input
                       type="number"
                       id="distance"
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       value={distance}
                       onChange={(e) => setDistance(e.target.value)}
                     />
                   </div>
-                  <div class="max-w-sm py-2">
+                  <div className="max-w-sm py-2">
                     <label
                       htmlFor="duration"
-                      class="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
                       Varighet (minutter):
                     </label>
                     <input
                       type="number"
                       id="duration"
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       value={duration}
                       onChange={(e) => setDuration(e.target.value)}
                     />
                   </div>
-                  <div class="max-w-sm py-2">
+                  <div className="max-w-sm py-2">
                     <label
                       htmlFor="zone"
-                      class="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
                       Choose Zone
                     </label>
@@ -161,34 +214,50 @@ const WorkoutForm = () => {
                 </>
               )}
 
-              <div class="max-w-sm py-2">
+              <div className="max-w-sm py-2">
                 <label
                   htmlFor="description"
-                  class="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                  className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                 >
                   Beskrivelse:
                 </label>
                 <textarea
                   id="description"
-                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
 
-              <div class="max-w-sm py-2">
+              <div className="max-w-sm py-2">
                 <label
                   htmlFor="date"
-                  class="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                  className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                 >
                   Dato:
                 </label>
                 <input
                   type="date"
                   id="date"
-                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  value={formatDate(date)}
-                  onChange={(e) => setDate(new Date(e.target.value))}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </div>
+
+              <div className="max-w-sm py-2">
+                <label
+                  htmlFor="time"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Tid:
+                </label>
+                <input
+                  type="time"
+                  id="time"
+                  value={time}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  onChange={(e) => setTime(e.target.value)} // Antar at du har en setTime-funksjon i din useState hooks
                 />
               </div>
 
@@ -197,7 +266,51 @@ const WorkoutForm = () => {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenModal(false)}>
+          <Button color="gray" onClick={() => setOpenAddWorkoutModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={openViewWorkoutModal}
+        onClose={() => setOpenViewWorkoutModal(false)}
+      >
+        <Modal.Body>
+          {selectedWorkout && (
+            <div className="space-y-6">
+              <div className="max-w-md py-2">
+                <h2 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                  {selectedWorkout.title}
+                </h2>
+                <p className="text-sm text-gray-900 dark:text-white">
+                  Dato: {formatDate(selectedWorkout.start)}
+                </p>
+                <p className="text-sm text-gray-900 dark:text-white">
+                  Type: {selectedWorkout.type}
+                </p>
+                {selectedWorkout.type === "Løping" && (
+                  <>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      Varighet: {selectedWorkout.duration} minutter
+                    </p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      Distanse: {selectedWorkout.distance} km
+                    </p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      Intensitet: Sone {selectedWorkout.intensity}
+                    </p>
+                  </>
+                )}
+                <p className="text-sm text-gray-900 dark:text-white">
+                  Notater: {selectedWorkout.description}
+                </p>
+              </div>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button color="gray" onClick={() => setOpenViewWorkoutModal(false)}>
             Close
           </Button>
         </Modal.Footer>
