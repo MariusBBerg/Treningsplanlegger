@@ -1,24 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import HomePage from './components/HomePage';
+import LoginForm from "./components/LoginForm.js";
+import RegisterForm from "./components/RegisterForm.js";
+import DashBoard from "./components/DashBoard.js";
+import ProtectedRoute from "./components/ProtectedRoute.js";
+import PublicRoute from "./components/PublicRoute.js";
+import Logout from "./components/LogOut.js"; // Importer Logout-komponenten
+import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+
+          <Route path="/login" element={
+            <PublicRoute>
+              <LoginForm />
+            </PublicRoute>
+            } />
+
+
+          <Route path="/register" element={
+            <PublicRoute>
+              <RegisterForm />
+            </PublicRoute>
+            } />
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashBoard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/logout" element={<Logout />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

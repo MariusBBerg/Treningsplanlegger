@@ -1,0 +1,18 @@
+AuthController
+Ansvar: Håndterer autentisering (/login) og registrering (/register) av brukere.
+Hvordan den fungerer: Ved en POST-forespørsel til /login eller /register, mottar den brukerdata (enten CredentialsDto for innlogging eller SignUpDto for registrering), behandler disse gjennom UserService, og returnerer en UserDto som inkluderer et JWT-token ved vellykket operasjon.
+DTOs (Data Transfer Objects)
+CredentialsDto, SignUpDto, UserDto, og ErrorDto: Brukes for å overføre data mellom klienten og serveren. SignUpDto og CredentialsDto brukes for inndata til registrering og innlogging, mens UserDto er for utdata som også inkluderer et JWT-token for autentiserte brukere. ErrorDto brukes for å representere feilmeldinger.
+Formål: Å isolere hva som sendes inn og ut fra API-endepunktene, for å ikke eksponere hele databasemodellen og for å validere inndata.
+Entiteter
+User og Workout: Representerer datamodellen som vil persistere til databasen. User inkluderer personlig informasjon samt en liste over Workout-instanser, som viser en "One to Many"-relasjon.
+Relasjoner: User kan ha mange Workouts, etablert gjennom @OneToMany-relasjonen.
+Repositories
+UserRepository og WorkoutRepository: Spring Data JPA-repositorier for å håndtere CRUD-operasjoner på databasen for User- og Workout-entitetene.
+Tilpassede spørringer: Gjennom disse kan du hente brukere basert på e-post eller login, som er essensielt for autentiseringsflyten.
+UserMapper
+Ansvar: Mapper mellom entiteter (User) og DTOs (UserDto, SignUpDto).
+Bruk av MapStruct: Forenkler konverteringen mellom datamodellene, for eksempel når du lagrer en ny bruker i databasen eller returnerer brukerdata til klienten.
+UserService
+Kjernefunksjonalitet: Inneholder logikken for brukerregistrering, innlogging, og søk etter brukere basert på login. Den bruker UserRepository for databasetilgang og UserMapper for å konvertere mellom entiteter og DTOs.
+Sikkerhet: Bruker PasswordEncoder for å hashe passord før de lagres i databasen, og for å validere passord ved innlogging.
