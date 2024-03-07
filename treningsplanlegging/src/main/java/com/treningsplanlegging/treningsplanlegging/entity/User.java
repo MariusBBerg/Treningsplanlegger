@@ -2,6 +2,9 @@ package com.treningsplanlegging.treningsplanlegging.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,6 +34,7 @@ public class User {
     private String login;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<Workout> workouts = new ArrayList<>();
 
     public User() {

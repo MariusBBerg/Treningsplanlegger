@@ -1,6 +1,8 @@
 // src/main/java/com/treningsplanlegging/treningsplanlegging/service/WorkoutService.java
 package com.treningsplanlegging.treningsplanlegging.service;
 
+import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +20,18 @@ public class WorkoutService {
 
 
     public Workout addWorkout(WorkoutDto workoutDto, User user) {
-        
-        
         Workout workout = new Workout();
-        workout.setDate(workoutDto.getDate());
+        workout.setUser(user);
+        workout.setType(workoutDto.getType());
         workout.setDescription(workoutDto.getDescription());
-        workout.setUser(user); // Koble treningsøkten til brukeren
-
+        workout.setDate(workoutDto.getDate());
+        
+        if ("Løping".equals(workoutDto.getType()) && workoutDto.getDistance() != null && workoutDto.getDurationSeconds() != null && workoutDto.getDistance() > 0 && workoutDto.getDurationSeconds() > 0 && workoutDto.getIntensityZone() >0) {
+            workout.setDistance(workoutDto.getDistance());
+            workout.setDurationSeconds(workoutDto.getDurationSeconds());
+            workout.setIntensityZone(workoutDto.getIntensityZone());
+        }
+    
         return workoutRepository.save(workout);
     }
 }

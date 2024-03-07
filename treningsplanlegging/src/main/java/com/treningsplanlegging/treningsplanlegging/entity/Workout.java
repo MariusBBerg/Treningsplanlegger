@@ -2,10 +2,13 @@ package com.treningsplanlegging.treningsplanlegging.entity;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -23,11 +26,18 @@ public class Workout {
 
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     private Date date;
 
     private String description;
+    private String type;
+
+    private Double distance; // Distanse i kilometer, kan være null for ikke-løpeaktiviteter
+    private Long durationSeconds;
+    private Integer intensityZone;
 
     public Workout() {
     }

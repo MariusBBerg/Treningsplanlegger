@@ -27,6 +27,7 @@ public class WorkoutController {
 
     @PostMapping
     public ResponseEntity<Workout> addWorkout(@RequestBody WorkoutDto workoutDto) {
+        System.out.println(workoutDto.getDistance() + " " + workoutDto.getDurationSeconds() + " " + workoutDto.getType() + " " + workoutDto.getDescription() + " " + workoutDto.getDate());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
