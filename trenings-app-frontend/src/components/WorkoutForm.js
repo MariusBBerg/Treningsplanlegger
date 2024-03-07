@@ -6,6 +6,8 @@ import { Calendar, momentLocalizer } from "react-big-calendar"; // Importer Cale
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css"; // Importer CSS
 import { Button, Modal, Label, Select } from "flowbite-react";
+import './customCalendar.css'; // Juster stien til hvor din CSS-fil befinner seg
+
 
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
@@ -119,21 +121,35 @@ const WorkoutForm = () => {
       <Calendar
         localizer={localizer}
         defaultDate={new Date()}
-        defaultView="month"
+        defaultView="week"
         events={calendarEvents} // Bruk den formaterte listen av treningsøkter her
         style={{ height: "500px" }}
         selectable={true}
         onSelectSlot={({ start }) => {
-          const formattedDate = moment(start).format('YYYY-MM-DD');
-          const formattedTime = moment(start).format('HH:mm');
-          setDate(formattedDate);
-          setTime(formattedTime);
+          if (moment(start).format('HH:mm') === '00:00') {
+            // Sett standardtid til 12:00 midtpå dagen
+            const formattedDate = moment(start).format('YYYY-MM-DD');
+            const defaultTime = '12:00';
+            setDate(formattedDate);
+            setTime(defaultTime);
+          } else {
+            // Hvis en spesifikk tid allerede er valgt (for eksempel i dags- eller ukesvisning), bruk den valgte tiden
+            const formattedDate = moment(start).format('YYYY-MM-DD');
+            const formattedTime = moment(start).format('HH:mm');
+            setDate(formattedDate);
+            setTime(formattedTime);
+          }
           setOpenAddWorkoutModal(true);
         }}
         onSelectEvent={(event) => {
           setSelectedWorkout(event);
           setOpenViewWorkoutModal(true); // Åpne modalen for å vise en eksisterende treningsøkt
         }}
+
+        scrollToTime={moment()
+          .set({ h: 9, m: 0 })
+          .toDate()}
+
       />
 
       <Modal
