@@ -21,11 +21,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    private String firstName;
+    private String lastName;
 
     private String email;
 
     private String password;
+
+    private String login;
 
     @OneToMany(mappedBy = "user")
     private List<Workout> workouts = new ArrayList<>();
@@ -33,10 +36,12 @@ public class User {
     public User() {
     }
 
-    public User(String username, String email, String password) {
-        this.username = username;
+    public User(String login, String email, String password, String firstName, String lastName) {
+        this.login = login;
         this.email = email;
         this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public void addWorkout(Workout workout) {
@@ -47,6 +52,8 @@ public class User {
     public List<Workout> getWorkouts() {
         return new ArrayList<>(workouts);
     }
+
+
 
     // Getters and setters
     // Lombok @Getter and @Setter annotations automatically generate these
