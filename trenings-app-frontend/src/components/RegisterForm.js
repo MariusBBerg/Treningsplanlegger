@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importer useNavigate
-
+import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
-
+import { Button, TextInput, Card, Label } from 'flowbite-react';
 
 const RegisterForm = () => {
   const [login, setLogin] = useState("");
   const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // Bruk useNavigate-kroken
-
+  const navigate = useNavigate();
 
   const handleRegister = (e) => {
     e.preventDefault();
     authService.register(firstName, lastName, email, login, password).then(
       () => {
-        navigate('/login'); // Omdiriger til /login etter vellykket registrering
+        navigate('/login');
       },
       (error) => {
         console.log(error);
@@ -26,44 +24,70 @@ const [lastName, setLastName] = useState("");
   };
 
   return (
-    <form onSubmit={handleRegister}>
-      <input
-        type="text"
-        name="login"
-        value={login}
-        onChange={(e) => setLogin(e.target.value)}
-        placeholder="Login"
-      />
-      <input
-        type="password"
-        name="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-      />
-        <input
-            type="text"
-            name="firstName"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder="First Name"
-        />
-        <input
-            type="text"
-            name="lastName"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            placeholder="Last Name"
-        />
-        <input
-            type="text"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-        />
-      <button type="submit">Register</button>
-    </form>
+    <div className="w-full max-w-xs m-auto">
+      <Card>
+        <form onSubmit={handleRegister} className="space-y-6">
+          <div>
+            <Label htmlFor="login">Login</Label>
+            <TextInput
+              id="login"
+              type="text"
+              placeholder="Choose a login"
+              required={true}
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <TextInput
+              id="password"
+              type="password"
+              placeholder="Create a password"
+              required={true}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="firstName">First Name</Label>
+            <TextInput
+              id="firstName"
+              type="text"
+              placeholder="Your first name"
+              required={true}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="lastName">Last Name</Label>
+            <TextInput
+              id="lastName"
+              type="text"
+              placeholder="Your last name"
+              required={true}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <TextInput
+              id="email"
+              type="email"
+              placeholder="Your email address"
+              required={true}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <Button type="submit">
+            Register
+          </Button>
+        </form>
+      </Card>
+    </div>
   );
 };
 
