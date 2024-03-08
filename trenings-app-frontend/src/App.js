@@ -10,6 +10,7 @@ import PublicRoute from "./components/PublicRoute.js";
 import Logout from "./components/LogOut.js"; // Importer Logout-komponenten
 import { AuthProvider } from "./contexts/AuthContext";
 
+
 function App() {
   return (
     <AuthProvider>

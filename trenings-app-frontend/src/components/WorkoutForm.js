@@ -6,9 +6,13 @@ import { Calendar, momentLocalizer } from "react-big-calendar"; // Importer Cale
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css"; // Importer CSS
 import { Button, Modal, Label, Select } from "flowbite-react";
-import './customCalendar.css'; // Juster stien til hvor din CSS-fil befinner seg
+
+import 'moment/locale/nb'; // Importer norsk lokaliseringsfil
+
+import WeeklyRunningVolume from "./WeeklyRunningVolume.js"; // Importer komponenten
 
 
+moment.locale('nb');
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
 const WorkoutForm = () => {
@@ -19,9 +23,11 @@ const WorkoutForm = () => {
   const [distance, setDistance] = useState(""); // Bare relevant for løping
   const [duration, setDuration] = useState(""); // Bare relevant for løping
   const [zone, setZone] = useState(""); // Bare relevant for løping
+  const [currentWeek, setCurrentWeek] = useState(moment().isoWeek()); // Legg til denne tilstanden
 
   const [workouts, setWorkouts] = useState([]);
   const [selectedWorkout, setSelectedWorkout] = useState(null); // Legg til denne linjen
+
 
   const fetchWorkouts = async () => {
     try {
@@ -64,7 +70,10 @@ const WorkoutForm = () => {
     const durationInSeconds =
       type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
 
-    const dateTime = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm').toISOString();
+    const dateTime = moment(
+      `${date} ${time}`,
+      "YYYY-MM-DD HH:mm"
+    ).toISOString();
 
     const workoutData = {
       date: dateTime,
@@ -96,12 +105,12 @@ const WorkoutForm = () => {
   const calendarEvents = workouts.map((workout) => {
     // Konverter startdatoen til et moment-objekt for enklere håndtering.
     const startMoment = moment(workout.date);
-  
+
     // Bestem sluttidspunktet ved å legge til `durationSeconds` eller, som standard, 3600 sekunder (1 time).
     const endMoment = workout.durationSeconds
-      ? startMoment.clone().add(workout.durationSeconds, 'seconds')
-      : startMoment.clone().add(1, 'hours'); // Legger til 1 time som standard hvis `durationSeconds` er null.
-  
+      ? startMoment.clone().add(workout.durationSeconds, "seconds")
+      : startMoment.clone().add(1, "hours"); // Legger til 1 time som standard hvis `durationSeconds` er null.
+
     return {
       start: startMoment.toDate(),
       end: endMoment.toDate(),
@@ -113,7 +122,25 @@ const WorkoutForm = () => {
       notes: workout.description,
     };
   });
+
+  const handleRangeChange = (range) => {
+    let startOfWeek;
+    
+    // Sjekk om 'range' er et array (som det ofte er for ukevisning/månedsvisning)
+    if (Array.isArray(range)) {
+      startOfWeek = moment(range[0]).startOf('isoWeek');
+    } else if (range.start && range.end) { // For objekter som definerer et start- og sluttpunkt
+      startOfWeek = moment(range.start).startOf('isoWeek');
+    } else { // For enkeltstående datoobjekter (fallback)
+      startOfWeek = moment(range).startOf('isoWeek');
+    }
   
+    // Oppdater tilstanden med ukenummeret fra starten av uken
+    setCurrentWeek(startOfWeek.isoWeek());
+
+  };
+  
+
 
   return (
     <div>
@@ -121,21 +148,22 @@ const WorkoutForm = () => {
       <Calendar
         localizer={localizer}
         defaultDate={new Date()}
+        onRangeChange={handleRangeChange}
         defaultView="week"
         events={calendarEvents} // Bruk den formaterte listen av treningsøkter her
         style={{ height: "500px" }}
         selectable={true}
         onSelectSlot={({ start }) => {
-          if (moment(start).format('HH:mm') === '00:00') {
+          if (moment(start).format("HH:mm") === "00:00") {
             // Sett standardtid til 12:00 midtpå dagen
-            const formattedDate = moment(start).format('YYYY-MM-DD');
-            const defaultTime = '12:00';
+            const formattedDate = moment(start).format("YYYY-MM-DD");
+            const defaultTime = "12:00";
             setDate(formattedDate);
             setTime(defaultTime);
           } else {
             // Hvis en spesifikk tid allerede er valgt (for eksempel i dags- eller ukesvisning), bruk den valgte tiden
-            const formattedDate = moment(start).format('YYYY-MM-DD');
-            const formattedTime = moment(start).format('HH:mm');
+            const formattedDate = moment(start).format("YYYY-MM-DD");
+            const formattedTime = moment(start).format("HH:mm");
             setDate(formattedDate);
             setTime(formattedTime);
           }
@@ -145,11 +173,7 @@ const WorkoutForm = () => {
           setSelectedWorkout(event);
           setOpenViewWorkoutModal(true); // Åpne modalen for å vise en eksisterende treningsøkt
         }}
-
-        scrollToTime={moment()
-          .set({ h: 9, m: 0 })
-          .toDate()}
-
+        scrollToTime={moment().set({ h: 9, m: 0 }).toDate()}
       />
 
       <Modal
@@ -331,6 +355,9 @@ const WorkoutForm = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <WeeklyRunningVolume user={user} week={currentWeek} />
+      
+      
     </div>
   );
 };
