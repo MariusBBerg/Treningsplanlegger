@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../contexts/AuthContext";
-import logo from './assets/logo_nobg.png'; // Importer bildet
-
+import logo from "./assets/logo_nobg.png"; // Importer bildet
 
 const navigation = [
   { name: "Product", href: "#" },
@@ -12,26 +11,37 @@ const navigation = [
   { name: "Company", href: "#" },
 ];
 
-export default function Navigation( ) {
+const loggedInNavigation = [
+  { name: "Dashboard", href: "/dashboard" },
+  { name: "Profile", href: "/profile" },
+  { name: "Coach", href: "/coach" },
+];
+
+export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { loggedIn } = useAuth(); // Anta at dette er en hook som returnerer autentiseringsstatus
   const [hasScrolled, setHasScrolled] = useState(false);
 
-  
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
       setHasScrolled(offset > 30); // Sett til true hvis brukeren har scrollet mer enn 50px
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const navItems = loggedIn ? loggedInNavigation : navigation;
 
   return (
     <div className="bg-white">
-<header className={`fixed inset-x-0 top-0 z-50 ${hasScrolled ? 'bg-white' : ''}`}>
+      <header
+        className={`fixed inset-x-0 top-0 z-50 ${
+          hasScrolled ? "bg-white" : ""
+        }`}
+      >
         <nav
           className="flex items-center justify-between p-6 lg:px-8 shadow-md"
           aria-label="Global"
@@ -39,11 +49,7 @@ export default function Navigation( ) {
           <div className="flex lg:flex-1">
             <a href="/" className="-m-1.5 p-1.5">
               <span className="sr-only">NæsBerg Solutions</span>
-              <img
-                className="h-8 w-auto"
-                src={logo}
-                alt=""
-              />
+              <img className="h-8 w-auto" src={logo} alt="" />
             </a>
           </div>
           <div className="flex lg:hidden">
@@ -57,7 +63,7 @@ export default function Navigation( ) {
             </button>
           </div>
           <div className="hidden lg:flex lg:gap-x-12">
-            {navigation.map((item) => (
+            {navItems.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
@@ -80,10 +86,10 @@ export default function Navigation( ) {
           {loggedIn && (
             <div className="hidden lg:flex lg:flex-1 lg:justify-end">
               <a
-                href="/dashboard"
+                href="/logout"
                 className="text-sm font-semibold leading-6 text-gray-900"
               >
-                DashBoard <span aria-hidden="true">&rarr;</span>
+                Log Out <span aria-hidden="true">&rarr;</span>
               </a>
             </div>
           )}
@@ -99,11 +105,7 @@ export default function Navigation( ) {
             <div className="flex items-center justify-between">
               <a href="#" className="-m-1.5 p-1.5">
                 <span className="sr-only">NæsBerg Solutions</span>
-                <img
-                  className="h-8 w-auto"
-                  src={logo}
-                  alt=""
-                />
+                <img className="h-8 w-auto" src={logo} alt="" />
               </a>
               <button
                 type="button"
@@ -140,7 +142,6 @@ export default function Navigation( ) {
           </Dialog.Panel>
         </Dialog>
       </header>
-
     </div>
   );
 }

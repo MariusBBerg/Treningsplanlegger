@@ -10,6 +10,7 @@ import PublicRoute from "./components/PublicRoute.js";
 import Logout from "./components/LogOut.js"; // Importer Logout-komponenten
 import { AuthProvider } from "./contexts/AuthContext";
 import CoachRequestForm from "./components/CoachRequestForm";
+import ProfilePage from "./components/ProfilePage.js";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           />
 
           <Route path="/coach" element={<ProtectedRoute><CoachRequestForm /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage  /></ProtectedRoute>} />
           <Route path="/logout" element={<Logout />} />
         </Routes>
       </BrowserRouter>

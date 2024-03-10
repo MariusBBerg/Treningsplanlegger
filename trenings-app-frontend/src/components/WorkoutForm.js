@@ -76,7 +76,6 @@ const WorkoutForm = () => {
   const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(false);
   const [openViewWorkoutModal, setOpenViewWorkoutModal] = useState(false);
 
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

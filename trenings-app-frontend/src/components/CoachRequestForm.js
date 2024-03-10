@@ -13,6 +13,7 @@ import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import CardActions from "@mui/material/CardActions";
 
 import Navigation from "./Navigation"; // Sørg for at denne linjen er korrekt importert
 
@@ -116,57 +117,80 @@ const CoachRequestForm = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         Coach Requests
       </Typography>
-      <TextField
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        label="Search users"
-        variant="outlined"
-        fullWidth
-      />
       <Grid container spacing={2}>
-        {users.map((user) => (
-          <Grid item xs={12} sm={6} md={4} key={user.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" component="h2">
-                  {user.firstName}
+        <Grid item xs={12} sm={6}>
+          <Card sx={{ p: 2, height: "100%" }}>
+            <Typography variant="h5" component="h2" gutterBottom>
+              Find your coach
+            </Typography>
+            <TextField
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              label="Search users"
+              variant="outlined"
+              fullWidth
+            />
+            {users.map((user) => (
+              <Card key={user.id} sx={{ mb: 2 }}>
+                <CardContent>
+                  <Typography variant="h6" component="h2">
+                    {user.firstName}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => sendRequest(user.id)}
+                  >
+                    Send Request
+                  </Button>
+                </CardActions>
+              </Card>
+            ))}
+          </Card>
+        </Grid>
+        
+          <Grid item xs={12} sm={6}>
+            <Card sx={{ p: 2, height: "100%" }}>
+              <Typography variant="h5" component="h2" gutterBottom>
+                Requests
+              </Typography>
+              {requests.length < 1 && (
+
+                <Typography variant="h6" component="body1" gutterBottom>
+                    You have no requests
                 </Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => sendRequest(user.id)}
-                >
-                  Send Request
-                </Button>
-              </CardContent>
+                )}
+              {requests.map((request) => (
+                <Card key={request.id} sx={{ mb: 2 }}>
+                  <CardContent>
+                    <Typography variant="body1">
+                      {request.requester.firstName} wants you to coach him.
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => respondToRequest(request.id, "Accepted")}
+                    >
+                      Accept
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => respondToRequest(request.id, "Rejected")}
+                    >
+                      Reject
+                    </Button>
+                  </CardActions>
+                </Card>
+              ))}
             </Card>
           </Grid>
-        ))}
+        
       </Grid>
-      <Box sx={{ mt: 3 }}>
-        {requests.map((request) => (
-          <Box key={request.id} sx={{ mb: 2 }}>
-            <Typography variant="body1">
-              {request.requester && request.requester.firstName} to{" "}
-              {request.requested && request.requested.firstName}
-            </Typography>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={() => respondToRequest(request.id, "Accepted")}
-            >
-              Accept
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => respondToRequest(request.id, "Rejected")}
-            >
-              Reject
-            </Button>
-          </Box>
-        ))}
-      </Box>
       <Snackbar
         open={open}
         autoHideDuration={6000}
