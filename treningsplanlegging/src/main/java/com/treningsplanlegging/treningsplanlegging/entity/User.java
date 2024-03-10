@@ -3,6 +3,7 @@ package com.treningsplanlegging.treningsplanlegging.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
@@ -37,9 +38,11 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "coach_id")
+    @JsonManagedReference
     private User coach;
 
     @OneToMany(mappedBy = "coach")
+    @JsonBackReference
     private List<User> clients = new ArrayList<>();
 
 
@@ -70,19 +73,23 @@ public class User {
     }
 
     public void setCoach(User coach) {
+        /* 
         if(this.coach != null) {
             throw new  IllegalStateException("User already has a coach");
         }
+        */
         this.coach = coach;
         coach.addClient(this);
     }
 
     public void addClient(User client) {
+        /* 
         if(this.clients.contains(client)) {
             throw new  IllegalStateException("User is already a client");
         }
+        */
         clients.add(client);
-        client.setCoach(this);
+        
     }
 
 

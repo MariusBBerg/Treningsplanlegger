@@ -43,4 +43,6 @@ public class AuthController {
         UserDto updatedUser = userService.assignCoach(userLogin, coachLogin);
         return ResponseEntity.ok(updatedUser);
     }
+
+    
 }

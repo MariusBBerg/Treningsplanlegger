@@ -90,4 +90,8 @@ public class UserService {
                    .collect(Collectors.toList());
     }
 
+    public List<User> searchUsers(String query) {
+        return userRepository.findByLoginContainingOrFirstNameContainingOrLastNameContaining(query, query, query);
+    }
+
 }

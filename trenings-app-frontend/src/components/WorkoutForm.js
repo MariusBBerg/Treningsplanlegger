@@ -6,6 +6,7 @@ import { Calendar, momentLocalizer } from "react-big-calendar"; // Importer Cale
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css"; // Importer CSS
 import { Button, Modal, Label, Select } from "flowbite-react";
+import CoachRequestForm from "./CoachRequestForm.js";
 
 import "moment/locale/nb"; // Importer norsk lokaliseringsfil
 
@@ -397,6 +398,8 @@ const WorkoutForm = () => {
         </Modal.Footer>
       </Modal>
       <WeeklyRunningVolume user={user} week={currentWeek} />
+
+      <CoachRequestForm/>
     </div>
   );
 };
