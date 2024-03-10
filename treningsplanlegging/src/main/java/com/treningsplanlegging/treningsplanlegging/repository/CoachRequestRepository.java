@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface CoachRequestRepository extends JpaRepository<CoachRequest, Long> {
     List<CoachRequest> findByRequestedAndStatus(User requested, String status);
+    CoachRequest findByRequesterAndRequestedAndStatus(User requester, User requested, String status);
 }

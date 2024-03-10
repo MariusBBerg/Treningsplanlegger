@@ -7,6 +7,8 @@ import com.treningsplanlegging.treningsplanlegging.repository.CoachRequestReposi
 import com.treningsplanlegging.treningsplanlegging.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 @Service
 public class CoachRequestService {
@@ -21,9 +23,18 @@ public class CoachRequestService {
 
     public void sendRequest(Long requesterId, Long requestedId) {
         User requester = userRepository.findById(requesterId)
-                                       .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         User requested = userRepository.findById(requestedId)
-                                       .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(requested.equals(requester)) {
+            throw new IllegalStateException("You cannot send a request to yourself");
+        }
+        CoachRequest existingRequest = coachRequestRepository.findByRequesterAndRequestedAndStatus(requester, requested,
+                "Pending");
+        if (existingRequest != null) {
+            throw new IllegalStateException("A pending request already exists");
+        }
         CoachRequest request = new CoachRequest();
         request.setRequester(requester);
         request.setRequested(requested);
@@ -33,11 +44,11 @@ public class CoachRequestService {
 
     public void respondToRequest(Long requestId, String response) {
         CoachRequest request = coachRequestRepository.findById(requestId)
-                                                   .orElseThrow(() -> new RuntimeException("Request not found"));
-        /* 
-        request.setStatus(response);
-        coachRequestRepository.save(request);
-        */      
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+        /*
+         * request.setStatus(response);
+         * coachRequestRepository.save(request);
+         */
         if ("Accepted".equals(response)) {
             User requester = request.getRequester();
             User requested = request.getRequested();
@@ -46,23 +57,21 @@ public class CoachRequestService {
             userRepository.save(requester);
             userRepository.save(requested);
             coachRequestRepository.delete(request);
-        }
-        else if ("Rejected".equals(response)) {
+        } else if ("Rejected".equals(response)) {
             coachRequestRepository.delete(request);
-        }
-        else{
+        } else {
 
         }
     }
 
     public List<CoachRequest> getPendingRequests(Long requestedId) {
         User requested = userRepository.findById(requestedId)
-                                       .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return coachRequestRepository.findByRequestedAndStatus(requested, "Pending");
     }
 
     public CoachRequest findById(Long id) {
         return coachRequestRepository.findById(id)
-                                     .orElseThrow(() -> new RuntimeException("Request not found"));
+                .orElseThrow(() -> new RuntimeException("Request not found"));
     }
 }
