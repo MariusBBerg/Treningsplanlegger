@@ -26,6 +26,7 @@ const WorkoutForm = () => {
 
   const userStr = localStorage.getItem("user");
   const user = userStr ? JSON.parse(userStr) : null;
+  console.log(user)
 
   const [client, setClient] = useState(""); // Legg til denne tilstanden for å holde styr på valgt klient
   const [clients, setClients] = useState([]); // Add this line at the top of your component

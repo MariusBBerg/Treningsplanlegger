@@ -31,12 +31,19 @@ export default function ProfilePage() {
       login,
     };
     try {
-      await axios.put("http://localhost:8080/api/users/me", userData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      localStorage.setItem('user', JSON.stringify({ ...user, ...userData }));
+      const response = await axios.put(
+        "http://localhost:8080/api/users/me",
+        userData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      //Oppdaterer med ny token
+      if (response.data.token) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+      }
     } catch (error) {
       console.error("Error updating user", error);
     }
@@ -99,13 +106,13 @@ export default function ProfilePage() {
           </Typography>
           <form onSubmit={handleFormSubmit}>
             <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="login"
-                label="Username"
-                defaultValue={user.login}
-                onChange = {(e) => setLogin(e.target.value)}
+              margin="normal"
+              required
+              fullWidth
+              id="login"
+              label="Username"
+              defaultValue={user.login}
+              onChange={(e) => setLogin(e.target.value)}
             />
             <TextField
               margin="normal"
@@ -114,7 +121,7 @@ export default function ProfilePage() {
               id="firstName"
               label="First Name"
               defaultValue={user.firstName}
-              onChange = {(e) => setFirstName(e.target.value)}
+              onChange={(e) => setFirstName(e.target.value)}
             />
             <TextField
               margin="normal"
@@ -123,7 +130,7 @@ export default function ProfilePage() {
               id="lastName"
               label="Last Name"
               defaultValue={user.lastName}
-              onChange = {(e) => setLastName(e.target.value)}
+              onChange={(e) => setLastName(e.target.value)}
             />
             <TextField
               margin="normal"
@@ -133,7 +140,7 @@ export default function ProfilePage() {
               label="Email Address"
               type="email"
               defaultValue={user.email}
-                onChange = {(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <Button type="submit" variant="contained" color="primary">
               Save Changes

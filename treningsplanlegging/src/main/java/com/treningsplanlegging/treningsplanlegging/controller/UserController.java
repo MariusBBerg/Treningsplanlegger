@@ -1,5 +1,6 @@
 package com.treningsplanlegging.treningsplanlegging.controller;
 
+import com.treningsplanlegging.treningsplanlegging.config.UserAuthenticationProvider;
 import com.treningsplanlegging.treningsplanlegging.dto.UserDto;
 import com.treningsplanlegging.treningsplanlegging.entity.User;
 import com.treningsplanlegging.treningsplanlegging.service.UserService;
@@ -12,9 +13,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.treningsplanlegging.treningsplanlegging.repository.UserRepository;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import com.treningsplanlegging.treningsplanlegging.mappers.UserMapper;
-
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,12 +26,16 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserAuthenticationProvider userAuthenticationProvider;
+
 
     @Autowired
-    public UserController(UserService userService, UserRepository userRepository, UserMapper userMapper) {
+    public UserController(UserService userService, UserRepository userRepository, UserMapper userMapper, UserAuthenticationProvider userAuthenticationProvider) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.userAuthenticationProvider = userAuthenticationProvider;
+
     }
 
     @GetMapping("/search")
@@ -42,10 +48,11 @@ public class UserController {
         users = users.stream()
                 .filter(user -> !user.getId().equals(currentUser.getId()))
                 .collect(Collectors.toList());
-        
+
         return ResponseEntity.ok(users);
     }
-        @PutMapping("/me")
+
+    @PutMapping("/me")
     public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto updatedUserDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -65,9 +72,15 @@ public class UserController {
 
         userRepository.save(currentUser);
 
-        // Convert the updated user to a UserDto
-        UserDto updatedUser = userMapper.toUserDto(currentUser);
+        //MÅ generere en ny token, siden nå er brukernavnet endret. Ser i retrospektiv at jeg burde brukt ID og ikke login som verdi i tokenet.
+        Authentication updatedAuthentication = new UsernamePasswordAuthenticationToken(updatedUserDto.getLogin(), null, authentication.getAuthorities());
+    SecurityContextHolder.getContext().setAuthentication(updatedAuthentication);
 
+
+        
+        UserDto updatedUser = userMapper.toUserDto(currentUser);
+        updatedUser.setToken(userAuthenticationProvider.createToken(updatedUser.getLogin()));
+        //Returnerer objektet med den nye tokenen
         return ResponseEntity.ok(updatedUser);
     }
 }
