@@ -1,5 +1,6 @@
 package com.treningsplanlegging.treningsplanlegging.dto;
 
+import java.util.List;
 import com.treningsplanlegging.treningsplanlegging.entity.User;
 
 import lombok.AllArgsConstructor;
@@ -24,6 +25,10 @@ public class UserDto {
     private String login;
     private String token;
     private String email;
+
+    private UserDto coach;
+    
+    private List <UserDto> clients;
 
 
 

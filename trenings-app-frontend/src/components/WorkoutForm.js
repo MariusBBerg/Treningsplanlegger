@@ -7,12 +7,11 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css"; // Importer CSS
 import { Button, Modal, Label, Select } from "flowbite-react";
 
-import 'moment/locale/nb'; // Importer norsk lokaliseringsfil
+import "moment/locale/nb"; // Importer norsk lokaliseringsfil
 
 import WeeklyRunningVolume from "./WeeklyRunningVolume.js"; // Importer komponenten
 
-
-moment.locale('nb');
+moment.locale("nb");
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
 const WorkoutForm = () => {
@@ -25,14 +24,22 @@ const WorkoutForm = () => {
   const [zone, setZone] = useState(""); // Bare relevant for løping
   const [currentWeek, setCurrentWeek] = useState(moment().isoWeek()); // Legg til denne tilstanden
 
+  const userStr = localStorage.getItem("user");
+  const user = userStr ? JSON.parse(userStr) : null;
+
+  const [client, setClient] = useState(""); // Legg til denne tilstanden for å holde styr på valgt klient
+  const [clients, setClients] = useState([]); // Add this line at the top of your component
+
   const [workouts, setWorkouts] = useState([]);
   const [selectedWorkout, setSelectedWorkout] = useState(null); // Legg til denne linjen
 
-
   const fetchWorkouts = async () => {
+    const clientParsed = client ? JSON.parse(client) : user;
+    console.log("fetch " + clientParsed.login);
+
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/workouts/user/${user.id}`,
+        `http://localhost:8080/api/workouts/user/${clientParsed.login}`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -45,17 +52,31 @@ const WorkoutForm = () => {
     }
   };
 
+  const fetchClients = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/workouts/clients`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      setClients(response.data); // Anta at response.data er en array av klienter
+    } catch (error) {
+      console.error("Det oppstod en feil ved henting av klienter", error);
+    }
+  };
+
   useEffect(() => {
     fetchWorkouts();
-  }, []);
+    fetchClients(); // Hent klienter når komponenten blir rendret
+  }, [client]);
 
   const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(false);
   const [openViewWorkoutModal, setOpenViewWorkoutModal] = useState(false);
 
   const navigate = useNavigate();
-
-  const userStr = localStorage.getItem("user");
-  const user = userStr ? JSON.parse(userStr) : null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,11 +104,15 @@ const WorkoutForm = () => {
       durationSeconds: durationInSeconds, // Bruk den konverterte varigheten i sekunder
       intensityZone: type === "Løping" ? parseInt(zone, 10) : undefined,
     };
-
+    const clientParsed = client ? JSON.parse(client) : user;    
+    console.log("set " + clientParsed.login);
     try {
       await axios.post("http://localhost:8080/api/workouts", workoutData, {
         headers: {
           Authorization: `Bearer ${user.token}`, // Bruker token fra auth context
+        },
+        params: {
+          clientLogin: clientParsed.login,
         },
       });
       //navigate("/dashboard"); // Naviger brukeren til dashboard etter suksessfull innsending
@@ -125,25 +150,41 @@ const WorkoutForm = () => {
 
   const handleRangeChange = (range) => {
     let startOfWeek;
-    
+
     // Sjekk om 'range' er et array (som det ofte er for ukevisning/månedsvisning)
     if (Array.isArray(range)) {
-      startOfWeek = moment(range[0]).startOf('isoWeek');
-    } else if (range.start && range.end) { // For objekter som definerer et start- og sluttpunkt
-      startOfWeek = moment(range.start).startOf('isoWeek');
-    } else { // For enkeltstående datoobjekter (fallback)
-      startOfWeek = moment(range).startOf('isoWeek');
+      startOfWeek = moment(range[0]).startOf("isoWeek");
+    } else if (range.start && range.end) {
+      // For objekter som definerer et start- og sluttpunkt
+      startOfWeek = moment(range.start).startOf("isoWeek");
+    } else {
+      // For enkeltstående datoobjekter (fallback)
+      startOfWeek = moment(range).startOf("isoWeek");
     }
-  
+
     // Oppdater tilstanden med ukenummeret fra starten av uken
     setCurrentWeek(startOfWeek.isoWeek());
-
   };
-  
-
 
   return (
     <div>
+      <div className="max-w-md py-2">
+        <div className="mb-2 block">
+          <Label htmlFor="client">Klient:</Label>
+        </div>
+        <Select
+          id="client"
+          value={client}
+          onChange={(e) => setClient(e.target.value)}
+        >
+          <option value="">Velg en klient</option>
+          {clients.map((client) => (
+            <option key={client.id} value={JSON.stringify(client)}>
+              {client.firstName} {client.lastName}
+            </option>
+          ))}
+        </Select>
+      </div>
       <label htmlFor="date">Dato:</label>
       <Calendar
         localizer={localizer}
@@ -356,8 +397,6 @@ const WorkoutForm = () => {
         </Modal.Footer>
       </Modal>
       <WeeklyRunningVolume user={user} week={currentWeek} />
-      
-      
     </div>
   );
 };

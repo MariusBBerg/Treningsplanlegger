@@ -3,8 +3,10 @@ package com.treningsplanlegging.treningsplanlegging.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.treningsplanlegging.treningsplanlegging.config.UserAuthenticationProvider;
@@ -36,4 +38,9 @@ public class AuthController {
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
     }
 
+    @PostMapping("/assign-coach")
+    public ResponseEntity<UserDto> assignCoach(@RequestParam String userLogin, @RequestParam String coachLogin) {
+        UserDto updatedUser = userService.assignCoach(userLogin, coachLogin);
+        return ResponseEntity.ok(updatedUser);
+    }
 }

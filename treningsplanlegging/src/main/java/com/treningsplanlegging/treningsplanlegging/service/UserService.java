@@ -15,10 +15,10 @@ import com.treningsplanlegging.treningsplanlegging.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
+import java.util.List;
 import java.nio.CharBuffer;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -31,20 +31,17 @@ public class UserService {
 
     private final UserMapper userMapper;
 
-
-     
     @Autowired
     public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
     }
 
-
     public UserDto register(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByLogin(userDto.getLogin());
 
         if (optionalUser.isPresent()) {
-            throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
+            throw new AppException("Username already exists", HttpStatus.BAD_REQUEST);
         }
 
         User user = userMapper.signUpToUser(userDto);
@@ -55,14 +52,13 @@ public class UserService {
         return userMapper.toUserDto(savedUser);
     }
 
-        
-        public UserDto findByLogin(String login){
-            User user = userRepository.findByLogin(login)
-                    .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
-                return userMapper.toUserDto(user);
-        }
+    public UserDto findByLogin(String login) {
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+        return userMapper.toUserDto(user);
+    }
 
-        public UserDto login(CredentialsDto credentialsDto) {
+    public UserDto login(CredentialsDto credentialsDto) {
         User user = userRepository.findByLogin(credentialsDto.getLogin())
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
 
@@ -72,8 +68,26 @@ public class UserService {
         throw new AppException("Invalid password", HttpStatus.BAD_REQUEST);
     }
 
+    public UserDto assignCoach(String userLogin, String coachLogin) {
+        User user = userRepository.findByLogin(userLogin)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
+        User coach = userRepository.findByLogin(coachLogin)
+                .orElseThrow(() -> new AppException("Coach not found", HttpStatus.NOT_FOUND));
 
+        user.setCoach(coach);
+
+        User updatedUser = userRepository.save(user);
+
+        return userMapper.toUserDto(updatedUser);
     }
 
+    public List<UserDto> getClients(String login) {
+        User user = userRepository.findByLogin(login)
+                                  .orElseThrow(() -> new RuntimeException("User not found with login: " + login));
+        return user.getClients().stream()
+                   .map(userMapper::toUserDto)
+                   .collect(Collectors.toList());
+    }
 
+}

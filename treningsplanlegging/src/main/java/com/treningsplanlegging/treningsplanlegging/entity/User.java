@@ -9,6 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -33,9 +35,19 @@ public class User {
 
     private String login;
 
+    @ManyToOne
+    @JoinColumn(name = "coach_id")
+    private User coach;
+
+    @OneToMany(mappedBy = "coach")
+    private List<User> clients = new ArrayList<>();
+
+
+
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
     private List<Workout> workouts = new ArrayList<>();
+
 
     public User() {
     }
@@ -55,6 +67,22 @@ public class User {
 
     public List<Workout> getWorkouts() {
         return new ArrayList<>(workouts);
+    }
+
+    public void setCoach(User coach) {
+        if(this.coach != null) {
+            throw new  IllegalStateException("User already has a coach");
+        }
+        this.coach = coach;
+        coach.addClient(this);
+    }
+
+    public void addClient(User client) {
+        if(this.clients.contains(client)) {
+            throw new  IllegalStateException("User is already a client");
+        }
+        clients.add(client);
+        client.setCoach(this);
     }
 
 

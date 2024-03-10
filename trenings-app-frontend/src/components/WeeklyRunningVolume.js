@@ -22,7 +22,7 @@ const WeeklyRunningVolume = ({ user, week }) => {
       end: endOfWeek.format('DD MMM'),
     });
 
-    const response = await axios.get(`http://localhost:8080/api/workouts/user/${user.id}`, {
+    const response = await axios.get(`http://localhost:8080/api/workouts/user/${user.login}`, {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
