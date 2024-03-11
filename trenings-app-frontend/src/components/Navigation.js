@@ -1,8 +1,21 @@
-import { useState, useEffect } from "react";
-import { Dialog } from "@headlessui/react";
+import { useState, useEffect  } from "react";
+import React, { Fragment } from 'react';
+
+import { Dialog, Menu, Transition } from "@headlessui/react";
+import { Dropdown } from 'flowbite-react';
+
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../contexts/AuthContext";
 import logo from "./assets/logo_nobg.png"; // Importer bildet
+import DropdownMenu from "./DropdownMenu";
+
+const menuItems = [
+  { name: "Requests", href: "/coach" },
+  { name: "All Clients", href: "/clients" },
+  { name: "Client Calendar", href: "/client-dashboard" },
+  
+  
+];
 
 const navigation = [
   { name: "Product", href: "#" },
@@ -18,6 +31,7 @@ const loggedInNavigation = [
 ];
 
 export default function Navigation() {
+  const [coachDropdownOpen, setCoachDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { loggedIn } = useAuth(); // Anta at dette er en hook som returnerer autentiseringsstatus
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -36,7 +50,7 @@ export default function Navigation() {
   const navItems = loggedIn ? loggedInNavigation : navigation;
 
   return (
-    <div className="bg-white">
+    <div className="bg-white mb-10">
       <header
         className={`fixed inset-x-0 top-0 z-50 ${
           hasScrolled ? "bg-white" : ""
@@ -62,16 +76,25 @@ export default function Navigation() {
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
-          <div className="hidden lg:flex lg:gap-x-12">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-sm font-semibold leading-6 text-gray-900"
-              >
-                {item.name}
-              </a>
-            ))}
+          <div className="hidden lg:flex lg:gap-x-12 flex items-center">
+          {navItems.map((item) => (
+                    <React.Fragment key={item.name}>
+                      {item.name === "Coach" ? (
+                        <DropdownMenu items={menuItems} name={"Coach"} />
+
+                      ) : (
+                        <a
+                          key = {item.name}
+                          href={item.href}
+                          className="text-sm font-semibold leading-6 text-gray-900"
+                        >
+                          {item.name}
+                        </a>
+                      )}
+                      {console.log("item.name:", item.name)}
+
+                    </React.Fragment>
+                  ))}
           </div>
           {!loggedIn && (
             <div className="hidden lg:flex lg:flex-1 lg:justify-end">
@@ -119,14 +142,26 @@ export default function Navigation() {
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-gray-500/10">
                 <div className="space-y-2 py-6">
-                  {navigation.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                    >
-                      {item.name}
-                    </a>
+                  {navItems.map((item) => (
+                    <React.Fragment key={item.name}>
+                      {item.name === "Coach" ? (
+                            <Dropdown label="Dropdown" inline>
+                            <Dropdown.Item>Dashboard</Dropdown.Item>
+                            <Dropdown.Item>Settings</Dropdown.Item>
+                            <Dropdown.Item>Earnings</Dropdown.Item>
+                            <Dropdown.Item>Sign out</Dropdown.Item>
+                          </Dropdown>
+                      ) : (
+                        <a
+                          href={item.href}
+                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                        >
+                          {item.name}
+                        </a>
+                      )}
+                      {console.log("item.name:", item.name)}
+
+                    </React.Fragment>
                   ))}
                 </div>
                 <div className="py-6">

@@ -6,10 +6,12 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-const WeeklyRunningVolume = ({ user, week }) => {
+const WeeklyRunningVolume = ({ client, week }) => {
   const [weeklyVolume, setWeeklyVolume] = useState(0);
   // Legg til state for å holde på start- og sluttdatoene for uken
   const [weekRange, setWeekRange] = useState({ start: '', end: '' });
+  const userStr = localStorage.getItem("user");
+  const user = userStr ? JSON.parse(userStr) : null;
 
   const fetchWeeklyVolume = async (week) => {
     // Beregn starten og slutten av uken basert på den valgte uken
@@ -22,7 +24,7 @@ const WeeklyRunningVolume = ({ user, week }) => {
       end: endOfWeek.format('DD MMM'),
     });
 
-    const response = await axios.get(`http://localhost:8080/api/workouts/user/${user.login}`, {
+    const response = await axios.get(`http://localhost:8080/api/workouts/user/${client.login}`, {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
@@ -42,10 +44,10 @@ const WeeklyRunningVolume = ({ user, week }) => {
   };
 
   useEffect(() => {
-    if (user && week) {
+    if (client && week) {
       fetchWeeklyVolume(week);
     }
-  }, [user, week]);
+  }, [client, week]);
 
   return (
     <Card sx={{ minWidth: 275, margin: 2 }}>

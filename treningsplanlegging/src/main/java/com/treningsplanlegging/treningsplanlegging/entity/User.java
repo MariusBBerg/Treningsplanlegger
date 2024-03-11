@@ -79,7 +79,6 @@ public class User {
         }
         */
         this.coach = coach;
-        coach.addClient(this);
     }
 
     public void addClient(User client) {
@@ -90,6 +89,10 @@ public class User {
         */
         clients.add(client);
         
+    }
+    public void removeClient(User client) {
+        clients.remove(client);
+        client.setCoach(null);
     }
 
 

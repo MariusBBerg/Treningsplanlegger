@@ -47,13 +47,13 @@ const HomePage = () => {
             <div className="mt-10 flex items-center justify-center gap-x-6">
               {/* Oppdaterte farger: Blå for "Get started"-knappen og oransje for "Learn more"-linken */}
               <a
-                href="#"
+                href="/register"
                 className="rounded-md bg-blue-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
               >
                 Get started
               </a>
               <a
-                href="#"
+                href="/#features"
                 className="text-sm font-semibold leading-6 text-orange-500"
               >
                 Learn more <span aria-hidden="true">→</span>

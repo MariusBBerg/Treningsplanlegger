@@ -2,24 +2,22 @@ import React, { useState } from "react";
 import authService from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { Button, TextInput, Card, Label } from "flowbite-react";
-import { useAuth } from '../contexts/AuthContext'; // Importer useAuth
-import { set } from "date-fns";
-
+import { Button, TextField, Card, Typography } from "@mui/material"; // Importerer Material-UI-komponenter
+import { useAuth } from '../contexts/AuthContext';
+import Navigation from "./Navigation";
 
 const LoginForm = ({ onSwitchForm }) => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { setLoggedIn } = useAuth(); // Hent setLoggedIn funksjonen fra AuthContext
-
+  const { setLoggedIn } = useAuth();
 
   const handleLogin = (e) => {
     e.preventDefault();
     authService.login(login, password).then(
       () => {
         navigate("/dashboard");
-        setLoggedIn(true); // Sett loggedIn til true for å oppdatere innloggingsstatusen
+        setLoggedIn(true);
       },
       (error) => {
         console.log(error);
@@ -27,42 +25,49 @@ const LoginForm = ({ onSwitchForm }) => {
     );
   };
 
+  const handleRegister = () => {
+    navigate("/register"); // Navigerer til "/register" ved klikk på knappen
+  };
+
   return (
     <div>
-      <Card>
+      <Navigation />
+      <Card variant="outlined" sx={{ maxWidth: 400, margin: "auto", marginTop: 20, padding: 3 }}>
+        <Typography variant="h5" align="center" gutterBottom>
+          Log In
+        </Typography>
         <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <Label htmlFor="login">Login</Label>
-            <TextInput
-              id="login"
-              type="text"
-              placeholder="Your login"
-              required={true}
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <TextInput
-              id="password"
-              type="password"
-              placeholder="Your password"
-              required={true}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <Button type="submit">Log In</Button>
+          <TextField
+            id="login"
+            label="Username"
+            variant="outlined"
+            fullWidth
+            required
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            id="password"
+            label="Password"
+            type="password"
+            variant="outlined"
+            fullWidth
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            margin="normal"
+          />
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Log In
+          </Button>
         </form>
-        <div className="text-center mt-4">
-          <p className="text-center mt-4">
-            Har du ikke en konto?{" "}
-            <Button color="gray" size="xs" onClick={onSwitchForm}>
-              Registrer deg
-            </Button>
-          </p>{" "}
-        </div>
+        <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>
+          Don't have an account?{" "}
+          <Button color="secondary" onClick={handleRegister}> 
+            Register
+          </Button>
+        </Typography>
       </Card>
     </div>
   );

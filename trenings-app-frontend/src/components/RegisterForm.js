@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import authService from '../services/authService';
-import { Button, TextInput, Card, Label } from 'flowbite-react';
-
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import authService from "../services/authService";
+import { Button, TextField, Card, Typography, Grid } from "@mui/material"; // Importerer Material-UI-komponenter
+import Navigation from "./Navigation";
 const RegisterForm = () => {
   const [login, setLogin] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -15,7 +15,7 @@ const RegisterForm = () => {
     e.preventDefault();
     authService.register(firstName, lastName, email, login, password).then(
       () => {
-        navigate('/login');
+        navigate("/login");
       },
       (error) => {
         console.log(error);
@@ -24,68 +24,77 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="w-full max-w-xs m-auto">
-      <Card>
+    <div>
+      <Navigation />
+      <Card
+        variant="outlined"
+        sx={{ maxWidth: 400, margin: "auto", marginTop: 20, padding: 3 }}
+      >
+        <Typography variant="h5" align="center" gutterBottom>
+          Register
+        </Typography>
         <form onSubmit={handleRegister} className="space-y-6">
-          <div>
-            <Label htmlFor="login">Login</Label>
-            <TextInput
-              id="login"
-              type="text"
-              placeholder="Choose a login"
-              required={true}
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <TextInput
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              required={true}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="firstName">First Name</Label>
-            <TextInput
-              id="firstName"
-              type="text"
-              placeholder="Your first name"
-              required={true}
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="lastName">Last Name</Label>
-            <TextInput
-              id="lastName"
-              type="text"
-              placeholder="Your last name"
-              required={true}
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <TextInput
-              id="email"
-              type="email"
-              placeholder="Your email address"
-              required={true}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <Button type="submit">
-            Register
+          <TextField
+            id="login"
+            label="Login"
+            variant="outlined"
+            fullWidth
+            required
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            id="password"
+            label="Password"
+            type="password"
+            variant="outlined"
+            fullWidth
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            id="firstName"
+            label="First Name"
+            variant="outlined"
+            fullWidth
+            required
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            id="lastName"
+            label="Last Name"
+            variant="outlined"
+            fullWidth
+            required
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            id="email"
+            label="Email"
+            type="email"
+            variant="outlined"
+            fullWidth
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            margin="normal"
+          />
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Make Account
           </Button>
         </form>
+        <Grid container justifyContent="center" marginTop={2}>
+          <Typography variant="body2">
+            Already have an account? <Link to="/login">Log in</Link>
+          </Typography>
+        </Grid>
       </Card>
     </div>
   );

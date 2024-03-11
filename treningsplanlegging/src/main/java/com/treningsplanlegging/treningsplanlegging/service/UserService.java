@@ -38,7 +38,7 @@ public class UserService {
     }
 
     public UserDto register(SignUpDto userDto) {
-        Optional<User> optionalUser = userRepository.findByLogin(userDto.getLogin());
+        Optional<User> optionalUser = userRepository.findByLoginIgnoreCase(userDto.getLogin());
 
         if (optionalUser.isPresent()) {
             throw new AppException("Username already exists", HttpStatus.BAD_REQUEST);
@@ -53,14 +53,14 @@ public class UserService {
     }
 
     public UserDto findByLogin(String login) {
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+        User user = userRepository.findByLoginIgnoreCase(login)
+        .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
         return userMapper.toUserDto(user);
     }
 
     public UserDto login(CredentialsDto credentialsDto) {
-        User user = userRepository.findByLogin(credentialsDto.getLogin())
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+        User user = userRepository.findByLoginIgnoreCase(credentialsDto.getLogin())
+        .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
             return userMapper.toUserDto(user);
@@ -69,13 +69,14 @@ public class UserService {
     }
 
     public UserDto assignCoach(String userLogin, String coachLogin) {
-        User user = userRepository.findByLogin(userLogin)
+        User user = userRepository.findByLoginIgnoreCase(userLogin)
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
-        User coach = userRepository.findByLogin(coachLogin)
+        User coach = userRepository.findByLoginIgnoreCase(coachLogin)
                 .orElseThrow(() -> new AppException("Coach not found", HttpStatus.NOT_FOUND));
 
         user.setCoach(coach);
+        coach.addClient(user);
 
         User updatedUser = userRepository.save(user);
 

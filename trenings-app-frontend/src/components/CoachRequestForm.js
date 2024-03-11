@@ -158,14 +158,14 @@ const CoachRequestForm = () => {
               </Typography>
               {requests.length < 1 && (
 
-                <Typography variant="h6" component="body1" gutterBottom>
+                <Typography variant="h6"  gutterBottom>
                     You have no requests
                 </Typography>
                 )}
               {requests.map((request) => (
                 <Card key={request.id} sx={{ mb: 2 }}>
                   <CardContent>
-                    <Typography variant="body1">
+                    <Typography >
                       {request.requester.firstName} wants you to coach him.
                     </Typography>
                   </CardContent>

@@ -14,7 +14,7 @@ import WeeklyRunningVolume from "./WeeklyRunningVolume.js"; // Importer komponen
 moment.locale("nb");
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
-const WorkoutForm = () => {
+const UserWorkoutForm = () => {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
@@ -28,19 +28,17 @@ const WorkoutForm = () => {
   const user = userStr ? JSON.parse(userStr) : null;
   console.log(user)
 
-  const [client, setClient] = useState(""); // Legg til denne tilstanden for å holde styr på valgt klient
-  const [clients, setClients] = useState([]); // Add this line at the top of your component
+  
 
   const [workouts, setWorkouts] = useState([]);
   const [selectedWorkout, setSelectedWorkout] = useState(null); // Legg til denne linjen
 
   const fetchWorkouts = async () => {
-    const clientParsed = client ? JSON.parse(client) : user;
-    console.log("fetch " + clientParsed.login);
+    
 
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/workouts/user/${clientParsed.login}`,
+        `http://localhost:8080/api/workouts/user/${user.login}`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -53,26 +51,11 @@ const WorkoutForm = () => {
     }
   };
 
-  const fetchClients = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/api/workouts/clients`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      setClients(response.data); // Anta at response.data er en array av klienter
-    } catch (error) {
-      console.error("Det oppstod en feil ved henting av klienter", error);
-    }
-  };
+  
 
   useEffect(() => {
     fetchWorkouts();
-    fetchClients(); // Hent klienter når komponenten blir rendret
-  }, [client]);
+  }, );
 
   const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(false);
   const [openViewWorkoutModal, setOpenViewWorkoutModal] = useState(false);
@@ -104,15 +87,14 @@ const WorkoutForm = () => {
       durationSeconds: durationInSeconds, // Bruk den konverterte varigheten i sekunder
       intensityZone: type === "Løping" ? parseInt(zone, 10) : undefined,
     };
-    const clientParsed = client ? JSON.parse(client) : user;    
-    console.log("set " + clientParsed.login);
+    
     try {
       await axios.post("http://localhost:8080/api/workouts", workoutData, {
         headers: {
           Authorization: `Bearer ${user.token}`, // Bruker token fra auth context
         },
         params: {
-          clientLogin: clientParsed.login,
+          clientLogin: user.login,
         },
       });
       //navigate("/dashboard"); // Naviger brukeren til dashboard etter suksessfull innsending
@@ -168,23 +150,7 @@ const WorkoutForm = () => {
 
   return (
     <div>
-      <div className="max-w-md py-2">
-        <div className="mb-2 block">
-          <Label htmlFor="client">Klient:</Label>
-        </div>
-        <Select
-          id="client"
-          value={client}
-          onChange={(e) => setClient(e.target.value)}
-        >
-          <option value="">Velg en klient</option>
-          {clients.map((client) => (
-            <option key={client.id} value={JSON.stringify(client)}>
-              {client.firstName} {client.lastName}
-            </option>
-          ))}
-        </Select>
-      </div>
+
       <label htmlFor="date">Dato:</label>
       <Calendar
         localizer={localizer}
@@ -396,10 +362,10 @@ const WorkoutForm = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <WeeklyRunningVolume user={user} week={currentWeek} />
+      <WeeklyRunningVolume client={user} week={currentWeek} />
 
     </div>
   );
 };
 
-export default WorkoutForm;
+export default UserWorkoutForm;

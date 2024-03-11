@@ -74,7 +74,7 @@ public class UserController {
 
         //MÅ generere en ny token, siden nå er brukernavnet endret. Ser i retrospektiv at jeg burde brukt ID og ikke login som verdi i tokenet.
         Authentication updatedAuthentication = new UsernamePasswordAuthenticationToken(updatedUserDto.getLogin(), null, authentication.getAuthorities());
-    SecurityContextHolder.getContext().setAuthentication(updatedAuthentication);
+        SecurityContextHolder.getContext().setAuthentication(updatedAuthentication);
 
 
         
@@ -82,5 +82,28 @@ public class UserController {
         updatedUser.setToken(userAuthenticationProvider.createToken(updatedUser.getLogin()));
         //Returnerer objektet med den nye tokenen
         return ResponseEntity.ok(updatedUser);
+    }
+
+
+    @DeleteMapping("/clients/{clientId}")
+    public ResponseEntity<Void> deleteClient(@PathVariable Long clientId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String login = authentication.getName();
+        User currentUser = userRepository.findByLogin(login)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
+
+        // Check if the current user has permission to delete the client
+        User client = userRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Client not found with id: " + clientId));
+        if (!client.getCoach().getId().equals(currentUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        // Delete the client
+        currentUser.removeClient(client);
+        userRepository.save(currentUser);
+        userRepository.save(client);
+
+        return ResponseEntity.ok().build();
     }
 }
