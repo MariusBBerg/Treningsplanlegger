@@ -39,4 +39,7 @@ public class WorkoutService {
     public List<Workout> findAllWorkoutsForUser(Long userId) {
         return workoutRepository.findByUserId(userId);
     }
+    public Workout findById(Long id) {
+        return workoutRepository.findById(id).orElseThrow(() -> new RuntimeException("Workout not found with id: " + id));
+    }
 }

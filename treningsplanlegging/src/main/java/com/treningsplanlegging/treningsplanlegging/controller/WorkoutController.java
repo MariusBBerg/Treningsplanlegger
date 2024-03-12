@@ -83,4 +83,32 @@ public class WorkoutController {
         return ResponseEntity.ok(clients);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<WorkoutDto> updateWorkout(@PathVariable Long id, @RequestBody WorkoutDto workoutDto, @RequestParam String clientLogin) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String login = authentication.getName();
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
+        User client = userRepository.findByLogin(clientLogin).orElseThrow(() -> new RuntimeException("User not found with username: " + clientLogin));
+        if(!user.equals(client.getCoach()) && !user.equals(client)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        Workout currentWorkout = workoutService.findById(id);
+        currentWorkout.setType(workoutDto.getType());
+        currentWorkout.setDescription(workoutDto.getDescription());
+        currentWorkout.setDate(workoutDto.getDate());
+        if ("Løping".equals(workoutDto.getType()) && workoutDto.getDistance() != null && workoutDto.getDurationSeconds() != null && workoutDto.getDistance() > 0 && workoutDto.getDurationSeconds() > 0 ) {
+            currentWorkout.setDistance(workoutDto.getDistance());
+            currentWorkout.setDurationSeconds(workoutDto.getDurationSeconds());
+            currentWorkout.setIntensityZone(workoutDto.getIntensityZone());
+        }
+
+        workoutService.addWorkout(workoutDto, client);
+        return ResponseEntity.ok(workoutDto);
+
+    }
+
 }
