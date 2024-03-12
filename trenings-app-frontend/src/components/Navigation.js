@@ -91,7 +91,6 @@ export default function Navigation() {
                           {item.name}
                         </a>
                       )}
-                      {console.log("item.name:", item.name)}
 
                     </React.Fragment>
                   ))}
@@ -159,7 +158,6 @@ export default function Navigation() {
                           {item.name}
                         </a>
                       )}
-                      {console.log("item.name:", item.name)}
 
                     </React.Fragment>
                   ))}

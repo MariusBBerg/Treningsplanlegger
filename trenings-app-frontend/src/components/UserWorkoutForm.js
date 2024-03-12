@@ -19,14 +19,13 @@ const UserWorkoutForm = () => {
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
-  const [distance, setDistance] = useState(""); // Bare relevant for løping
-  const [duration, setDuration] = useState(""); // Bare relevant for løping
-  const [zone, setZone] = useState(""); // Bare relevant for løping
-  const [currentWeek, setCurrentWeek] = useState(moment().isoWeek()); // Legg til denne tilstanden
+  const [distance, setDistance] = useState(""); 
+  const [duration, setDuration] = useState(""); 
+  const [zone, setZone] = useState(""); 
+  const [currentWeek, setCurrentWeek] = useState(moment().isoWeek()); 
 
   const userStr = localStorage.getItem("user");
   const user = userStr ? JSON.parse(userStr) : null;
-  console.log(user)
 
   
 
@@ -55,7 +54,7 @@ const UserWorkoutForm = () => {
 
   useEffect(() => {
     fetchWorkouts();
-  }, );
+  },[user.login] ); //ENDRES HVER GANG BRUKER-OBJEKTET
 
   const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(false);
   const [openViewWorkoutModal, setOpenViewWorkoutModal] = useState(false);
@@ -97,8 +96,8 @@ const UserWorkoutForm = () => {
           clientLogin: user.login,
         },
       });
-      //navigate("/dashboard"); // Naviger brukeren til dashboard etter suksessfull innsending
       setOpenAddWorkoutModal(false);
+      console.log("a")
       fetchWorkouts();
     } catch (error) {
       console.error("Det oppstod en feil ved innsending av treningsøkt", error);
