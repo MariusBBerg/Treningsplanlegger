@@ -5,6 +5,7 @@ import com.treningsplanlegging.treningsplanlegging.dto.WorkoutDto;
 import com.treningsplanlegging.treningsplanlegging.entity.User;
 import com.treningsplanlegging.treningsplanlegging.entity.Workout;
 import com.treningsplanlegging.treningsplanlegging.repository.UserRepository;
+import com.treningsplanlegging.treningsplanlegging.repository.WorkoutRepository;
 import com.treningsplanlegging.treningsplanlegging.service.WorkoutService;
 import com.treningsplanlegging.treningsplanlegging.service.UserService;
 
@@ -22,13 +23,15 @@ public class WorkoutController {
 
     private final WorkoutService workoutService;
     private final UserRepository userRepository;
-    private final UserService userService; // Legg til UserService her
+    private final UserService userService; 
+    private final WorkoutRepository workoutRepository;
 
     @Autowired
-    public WorkoutController(WorkoutService workoutService, UserRepository userRepository, UserService userService) {
+    public WorkoutController(WorkoutService workoutService, UserRepository userRepository, UserService userService, WorkoutRepository workoutRepository) {
         this.workoutService = workoutService;
         this.userRepository = userRepository;
-        this.userService = userService; // Legg til userService her
+        this.userService = userService; 
+        this.workoutRepository = workoutRepository;
     }
 
     @PostMapping
@@ -106,7 +109,7 @@ public class WorkoutController {
             currentWorkout.setIntensityZone(workoutDto.getIntensityZone());
         }
 
-        workoutService.addWorkout(workoutDto, client);
+        workoutRepository.save(currentWorkout);
         return ResponseEntity.ok(workoutDto);
 
     }
