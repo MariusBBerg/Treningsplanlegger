@@ -1,18 +1,18 @@
 // src/App.js
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomePage from './components/HomePage';
-import LoginForm from "./components/LoginForm.js";
-import RegisterForm from "./components/RegisterForm.js";
-import DashBoard from "./components/DashBoard.js";
-import ProtectedRoute from "./components/ProtectedRoute.js";
-import PublicRoute from "./components/PublicRoute.js";
-import Logout from "./components/LogOut.js"; // Importer Logout-komponenten
+import HomePage from './views/HomePage';
+import LoginForm from "./views/LoginForm.js";
+import RegisterForm from "./views/RegisterForm.js";
+import DashBoard from "./views/DashBoard.js";
+import ProtectedRoute from "./auth/ProtectedRoute.js";
+import PublicRoute from "./auth/PublicRoute.js";
+import Logout from "./components/LogOut.js"; // 
 import { AuthProvider } from "./contexts/AuthContext";
-import CoachRequestForm from "./components/CoachRequestForm";
-import ProfilePage from "./components/ProfilePage.js";
-import ClientList from "./components/ClientList.js";
-import ClientDashboard from "./components/ClientDashboard.js";
+import CoachRequestForm from "./views/CoachRequestForm";
+import ProfilePage from "./views/ProfilePage.js";
+import ClientList from "./views/ClientList.js";
+import ClientDashboard from "./views/ClientDashboard.js";
 
 function App() {
   return (

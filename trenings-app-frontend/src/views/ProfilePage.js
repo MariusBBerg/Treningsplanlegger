@@ -8,8 +8,9 @@ import {
   Modal,
   TextField,
 } from "@mui/material";
-import Navigation from "./Navigation"; // Importer Navigation komponenten
+import Navigation from '../components/Navigation/Navigation';
 import axios from "axios";
+import Footer from "../components/Footer";
 
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
@@ -52,7 +53,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div>
+    <div className="theme-bg min-h-screen flex flex-col justify-between" >
       <Navigation /> {/* Legg til Navigation komponenten */}
       <Container sx={{ mt: 15 }}>
         <Box
@@ -148,6 +149,7 @@ export default function ProfilePage() {
           </form>
         </Box>
       </Modal>
+      <Footer />
     </div>
   );
 }

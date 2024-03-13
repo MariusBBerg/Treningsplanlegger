@@ -4,7 +4,6 @@ import { isAuthenticated } from '../utils/auth';
 
 const ProtectedRoute = ({ children }) => {
   if (!isAuthenticated()) {
-    // Omdiriger til innloggingssiden hvis brukeren ikke er autentisert
     return <Navigate to="/login" />;
   }
 

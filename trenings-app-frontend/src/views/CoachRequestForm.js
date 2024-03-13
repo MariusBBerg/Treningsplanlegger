@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Card from "@mui/material/Card";
@@ -15,7 +11,8 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CardActions from "@mui/material/CardActions";
 
-import Navigation from "./Navigation"; // Sørg for at denne linjen er korrekt importert
+import Navigation from "../components/Navigation/Navigation"; // Sørg for at denne linjen er korrekt importert
+import Footer from "../components/Footer";
 
 const CoachRequestForm = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -112,6 +109,7 @@ const CoachRequestForm = () => {
   };
 
   return (
+    <div className="theme-bg min-h-screen flex flex-col justify-between"> {/* For å få footer til å bli nederst */}
     <Container sx={{ mt: 15 }}>
       <Navigation />
       <Typography variant="h4" component="h1" gutterBottom>
@@ -218,6 +216,8 @@ const CoachRequestForm = () => {
         </Alert>
       </Snackbar>
     </Container>
+          <Footer />
+    </div>
   );
 };
 

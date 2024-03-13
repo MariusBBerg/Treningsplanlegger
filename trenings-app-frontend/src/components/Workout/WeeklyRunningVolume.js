@@ -4,7 +4,6 @@ import moment from 'moment';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
 
 const WeeklyRunningVolume = ({ client, week }) => {
   const [weeklyVolume, setWeeklyVolume] = useState(0);

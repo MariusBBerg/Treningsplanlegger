@@ -3,7 +3,8 @@ import axios from "axios";
 import { Container, Typography, List, ListItem, ListItemText, Button, Box } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import Navigation from "./Navigation";
+import Navigation from '../components/Navigation/Navigation';
+
 const ClientList = () => {
   const [clients, setClients] = useState([]);
   const userStr = localStorage.getItem("user");

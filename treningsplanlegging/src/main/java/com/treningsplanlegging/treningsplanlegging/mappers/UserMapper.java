@@ -11,12 +11,12 @@ import com.treningsplanlegging.treningsplanlegging.entity.User;
 public interface UserMapper {
 
 
+    @Mapping(target = "password", ignore = true)
+    User signUpToUser(SignUpDto signUpDto);
+
     @Mapping(target = "coach", ignore = true)
     @Mapping(target = "clients", ignore = true)
     UserDto toUserDto(User user);
-
-    @Mapping(target = "password", ignore = true)
-    User signUpToUser(SignUpDto signUpDto);
 
 
     

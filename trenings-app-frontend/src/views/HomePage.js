@@ -1,6 +1,6 @@
 import React from "react";
-import Navigation from "./Navigation";
-import Footer from "./Footer";
+import Navigation from '../components/Navigation/Navigation';
+import Footer from "../components/Footer";
 import { CloudArrowUpIcon, ShareIcon, CalendarDaysIcon, UserIcon } from "@heroicons/react/24/outline";
 
 const features = [
@@ -32,6 +32,7 @@ const features = [
 
 const HomePage = () => {
   return (
+    <div>
     <div className="theme-bg min-h-screen flex flex-col justify-between px-6 pt-14 lg:px-8 w-full">
       <Navigation />
       
@@ -89,8 +90,9 @@ const HomePage = () => {
           </div>
         </div>
       </main>
-      
-      <Footer />
+    </div>
+    <Footer />
+
     </div>
   );
 };

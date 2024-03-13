@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Button, TextField, Card, Typography } from "@mui/material"; // Importerer Material-UI-komponenter
 import { useAuth } from '../contexts/AuthContext';
-import Navigation from "./Navigation";
+import Navigation from '../components/Navigation/Navigation';
+import Footer from "../components/Footer";
 
 const LoginForm = ({ onSwitchForm }) => {
   const [login, setLogin] = useState("");
@@ -69,6 +70,7 @@ const LoginForm = ({ onSwitchForm }) => {
           </Button>
         </Typography>
       </Card>
+      <Footer />
     </div>
   );
 };

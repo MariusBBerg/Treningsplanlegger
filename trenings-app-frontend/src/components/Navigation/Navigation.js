@@ -5,8 +5,8 @@ import { Dialog, Menu, Transition } from "@headlessui/react";
 import { Dropdown } from 'flowbite-react';
 
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useAuth } from "../contexts/AuthContext";
-import logo from "./assets/logo_nobg.png"; // Importer bildet
+import { useAuth } from "../../contexts/AuthContext";
+import logo from "../assets/logo_nobg.png";
 import DropdownMenu from "./DropdownMenu";
 
 const menuItems = [

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import authService from "../services/authService";
 import { Button, TextField, Card, Typography, Grid } from "@mui/material"; // Importerer Material-UI-komponenter
-import Navigation from "./Navigation";
+import Navigation from '../components/Navigation/Navigation';
+
 const RegisterForm = () => {
   const [login, setLogin] = useState("");
   const [firstName, setFirstName] = useState("");
