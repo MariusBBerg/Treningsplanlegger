@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Calendar, Whisper, Popover, Badge } from 'rsuite';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
 import moment from "moment";
 import "moment/locale/nb"; 
 import { Button, Modal, Label, Select } from "flowbite-react";
@@ -99,37 +101,36 @@ const ClientWorkoutForm = () => {
     return moment(date).format("YYYY-MM-DD HH:mm");
   };
 
-  const calendarEvents = workouts.map((workout) => {
-    const startMoment = moment(workout.date);
-    const endMoment = workout.durationSeconds
-      ? startMoment.clone().add(workout.durationSeconds, "seconds")
-      : startMoment.clone().add(1, "hours");
+  const handleDateClick = (info) => {
+    console.log('Clicked on date:', info.dateStr);
+    // Perform any action you want here
+    const start = moment(info.date).format("YYYY-MM-DD");
+    const defaultTime = "12:00";
+    setDate(start);
+    setTime(defaultTime);
+    setOpenAddWorkoutModal(true);
+  };
 
+  const handleEventClick = (info) => {
+    console.log('Clicked on event:', info.event);
+    setSelectedWorkout(info.event);
+    setOpenViewWorkoutModal(true);
+  };
+
+  const events = workouts.map((workout) => {
+    const start = moment(workout.date).format('YYYY-MM-DDTHH:mm:ss');
+    const end = moment(workout.date)
+      .add(workout.durationSeconds || 3600, 'seconds')
+      .format('YYYY-MM-DDTHH:mm:ss');
+  
     return {
-      start: startMoment.toDate(),
-      end: endMoment.toDate(),
+      id: workout.id,
       title: workout.description,
-      type: workout.type,
-      duration: workout.durationSeconds ? workout.durationSeconds / 60 : 60,
-      distance: workout.distance,
-      intensity: workout.intensityZone,
-      notes: workout.description,
+      start: start,
+      end: end,
+      // Other event properties...
     };
   });
-
-  const handleRangeChange = (range) => {
-    let startOfWeek;
-
-    if (Array.isArray(range)) {
-      startOfWeek = moment(range[0]).startOf("isoWeek");
-    } else if (range.start && range.end) {
-      startOfWeek = moment(range.start).startOf("isoWeek");
-    } else {
-      startOfWeek = moment(range).startOf("isoWeek");
-    }
-
-    setCurrentWeek(startOfWeek.isoWeek());
-  };
 
   return (
     <div>
@@ -153,36 +154,17 @@ const ClientWorkoutForm = () => {
         </div>
       </div>
       
-      <label htmlFor="date">Dato:</label>
-      <Calendar
-        defaultDate={new Date()}
-        onRangeChange={handleRangeChange}
-        defaultView="week"
-        events={calendarEvents}
-        style={{ height: "500px" }}
-        selectable={true}
-        onSelectSlot={({ start }) => {
-          if (moment(start).format("HH:mm") === "00:00") {
-            const formattedDate = moment(start).format("YYYY-MM-DD");
-            const defaultTime = "12:00";
-            setDate(formattedDate);
-            setTime(defaultTime);
-          } else {
-            const formattedDate = moment(start).format("YYYY-MM-DD");
-            const formattedTime = moment(start).format("HH:mm");
-            setDate(formattedDate);
-            setTime(formattedTime);
-          }
-          setOpenAddWorkoutModal(true);
-        }}
-        onSelectEvent={(event) => {
-          setSelectedWorkout(event);
-          setOpenViewWorkoutModal(true);
-        }}
-        scrollToTime={moment().set({ h: 9, m: 0 }).toDate()}
+      <FullCalendar
+        plugins={[dayGridPlugin, interactionPlugin]}
+        initialView="dayGridMonth"
+        weekends={true}
+        events={events}
+        dateClick={handleDateClick} // Add date click handler
+        eventClick={handleEventClick} // Add event click handler
+        
       />
 
-      <Modal
+<Modal
         show={openAddWorkoutModal}
         onClose={() => setOpenAddWorkoutModal(false)}
       >
@@ -202,52 +184,177 @@ const ClientWorkoutForm = () => {
                   <option value="">Velg en type</option>
                   <option value="Løping">Løping</option>
                   <option value="Styrke">Styrke</option>
+                  <option value="Cardio">Cardio</option>
                 </Select>
               </div>
               {type === "Løping" && (
                 <>
-                  <div className="max-w-md py-2">
-                    <Label htmlFor="distance">Distanse (km):</Label>
+                  <div className="max-w-sm py-2">
+                    <label
+                      htmlFor="distance"
+                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                    >
+                      Distanse (km):
+                    </label>
                     <input
                       type="number"
                       id="distance"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       value={distance}
                       onChange={(e) => setDistance(e.target.value)}
                     />
                   </div>
-                  <div className="max-w-md py-2">
-                    <Label htmlFor="duration">Varighet (min):</Label>
+                  <div className="max-w-sm py-2">
+                    <label
+                      htmlFor="duration"
+                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                    >
+                      Varighet (minutter):
+                    </label>
                     <input
                       type="number"
                       id="duration"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       value={duration}
                       onChange={(e) => setDuration(e.target.value)}
                     />
                   </div>
-                  <div className="max-w-md py-2">
-                    <Label htmlFor="zone">Intensitetssone:</Label>
-                    <input
-                      type="number"
+                  <div className="max-w-sm py-2">
+                    <label
+                      htmlFor="zone"
+                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                    >
+                      Choose Zone
+                    </label>
+                    <Select
                       id="zone"
                       value={zone}
                       onChange={(e) => setZone(e.target.value)}
-                    />
+                    >
+                      <option value="">Choose a zone</option>
+                      <option value="1">Zone 1</option>
+                      <option value="2">Zone 2</option>
+                      <option value="3">Zone 3</option>
+                      <option value="4">Zone 4</option>
+                      <option value="5">Zone 5</option>
+                    </Select>
                   </div>
                 </>
               )}
-              <div className="max-w-md py-2">
-                <Label htmlFor="description">Beskrivelse:</Label>
+
+              <div className="max-w-sm py-2">
+                <label
+                  htmlFor="description"
+                  className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                >
+                  Beskrivelse:
+                </label>
                 <textarea
                   id="description"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                ></textarea>
+                />
               </div>
-              <Button type="submit">Submit</Button>
+
+              <div className="max-w-sm py-2">
+                <label
+                  htmlFor="date"
+                  className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                >
+                  Dato:
+                </label>
+                <input
+                  type="date"
+                  id="date"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </div>
+
+              <div className="max-w-sm py-2">
+                <label
+                  htmlFor="time"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Tid:
+                </label>
+                <input
+                  type="time"
+                  id="time"
+                  value={time}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  onChange={(e) => setTime(e.target.value)} // Antar at du har en setTime-funksjon i din useState hooks
+                />
+              </div>
+
+              <Button type="submit">Add Workout</Button>
             </form>
           </div>
         </Modal.Body>
+        <Modal.Footer>
+          <Button color="gray" onClick={() => setOpenAddWorkoutModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
       </Modal>
+
+      <Modal
+        show={openViewWorkoutModal}
+        onClose={() => setOpenViewWorkoutModal(false)}
+      >
+        <Modal.Body>
+          {selectedWorkout && (
+            console.log(selectedWorkout),
+            <div className="space-y-6">
+              <div className="max-w-md py-2">
+                <h2 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                  {selectedWorkout.title}
+                </h2>
+                <p className="text-sm text-gray-900 dark:text-white">
+                  Dato: {formatDate(selectedWorkout.start)}
+                </p>
+                <p className="text-sm text-gray-900 dark:text-white">
+                  Type: {selectedWorkout.type}
+                </p>
+                {selectedWorkout.type === "Løping" && (
+                  <>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      Varighet: {selectedWorkout.duration} minutter
+                    </p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      Distanse: {selectedWorkout.distance} km
+                    </p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      Intensitet: Sone {selectedWorkout.intensity}
+                    </p>
+                  </>
+                )}
+                <p className="text-sm text-gray-900 dark:text-white">
+                  Notater: {selectedWorkout.description}
+                </p>
+              </div>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button color="gray" onClick={() => setOpenViewWorkoutModal(false)}>
+            Close
+          </Button>
+          <Button
+            color="gray"
+            onClick={() => {
+              setOpenViewWorkoutModal(false);
+            }}
+          >
+            Edit
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <WeeklyRunningVolume client={user} week={currentWeek} />
+
+      
     </div>
   );
 };
