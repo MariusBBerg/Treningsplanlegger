@@ -1,17 +1,20 @@
-// src/components/WorkoutForm.js
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Calendar, momentLocalizer } from "react-big-calendar"; // Importer Calendar
+import { Calendar, momentLocalizer } from "react-big-calendar"; 
 import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css"; // Importer CSS
+import "react-big-calendar/lib/css/react-big-calendar.css"; 
 import { Button, Modal, Label, Select } from "flowbite-react";
 
-import "moment/locale/nb"; // Importer norsk lokaliseringsfil
+import "moment/locale/nb"; 
 
-import WeeklyRunningVolume from "./WeeklyRunningVolume.js"; // Importer komponenten
+import WeeklyRunningVolume from "./WeeklyRunningVolume.js"; 
+
+import fetchWorkouts from "./Hooks/workoutApi.js"; 
+
 
 moment.locale("nb");
-const localizer = momentLocalizer(moment); // or globalizeLocalizer
+const localizer = momentLocalizer(moment); 
 
 const UserWorkoutForm = () => {
   const [date, setDate] = useState("");
@@ -26,31 +29,17 @@ const UserWorkoutForm = () => {
   const userStr = localStorage.getItem("user");
   const user = userStr ? JSON.parse(userStr) : null;
   const [workouts, setWorkouts] = useState([]);
-  const [selectedWorkout, setSelectedWorkout] = useState(""); // Legg til denne linjen
+  const [selectedWorkout, setSelectedWorkout] = useState(""); // // Valgt treningsøkt i kalenderen
 
-  const fetchWorkouts = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/api/workouts/user/${user.login}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      setWorkouts(response.data); // Anta at response.data er en array av treningsøkter
-    } catch (error) {
-      console.error("Det oppstod en feil ved henting av treningsøkter", error);
-    }
-  };
+  
 
   useEffect(() => {
-    fetchWorkouts();
+    fetchWorkouts(null,user, setWorkouts);
   }, [user.login]); //ENDRES HVER GANG BRUKER-OBJEKTET
 
   const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(false);
   const [openViewWorkoutModal, setOpenViewWorkoutModal] = useState(false);
-  const [openEqditWorkoutModal, setOpenEditWorkoutModal] = useState(false);
+  const [openEditWorkoutModal, setOpenEditWorkoutModal] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -411,7 +400,7 @@ const UserWorkoutForm = () => {
       <WeeklyRunningVolume client={user} week={currentWeek} />
 
       <Modal
-        show={openEqditWorkoutModal}
+        show={openEditWorkoutModal}
         onClose={() => setOpenEditWorkoutModal(false)}
       >
         <Modal.Header>Edit Workout</Modal.Header>

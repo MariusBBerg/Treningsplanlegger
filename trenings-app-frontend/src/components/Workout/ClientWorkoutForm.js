@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Calendar, momentLocalizer } from "react-big-calendar"; // Importer Calendar
+import { Calendar, momentLocalizer } from "react-big-calendar"; 
 import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css"; // Importer CSS
+import "react-big-calendar/lib/css/react-big-calendar.css"; 
 import { Button, Modal, Label, Select } from "flowbite-react";
 
-import "moment/locale/nb"; // Importer norsk lokaliseringsfil
+import "moment/locale/nb"; 
 
-import WeeklyRunningVolume from "./WeeklyRunningVolume.js"; // Importer komponenten
+import WeeklyRunningVolume from "./WeeklyRunningVolume.js"; 
+
+import fetchWorkouts from "./Hooks/workoutApi.js"; 
+
 
 moment.locale("nb");
-const localizer = momentLocalizer(moment); // or globalizeLocalizer
+const localizer = momentLocalizer(moment); 
 
 const ClientWorkoutForm = () => {
   const [date, setDate] = useState("");
@@ -20,36 +23,22 @@ const ClientWorkoutForm = () => {
   const [distance, setDistance] = useState(""); // Bare relevant for løping
   const [duration, setDuration] = useState(""); // Bare relevant for løping
   const [zone, setZone] = useState(""); // Bare relevant for løping
-  const [currentWeek, setCurrentWeek] = useState(moment().isoWeek()); // Legg til denne tilstanden
+  const [currentWeek, setCurrentWeek] = useState(moment().isoWeek()); 
 
   const userStr = localStorage.getItem("user");
   const user = userStr ? JSON.parse(userStr) : null;
   console.log(user);
 
-  const [client, setClient] = useState(""); // Legg til denne tilstanden for å holde styr på valgt klient
-  const [clients, setClients] = useState([]); // Add this line at the top of your component
+  const [client, setClient] = useState(""); // Holde styr på valgt klient
+  const [clients, setClients] = useState([]); // Liste over alle klienter
 
   const [workouts, setWorkouts] = useState([]);
-  const [selectedWorkout, setSelectedWorkout] = useState(null); // Legg til denne linjen
+  const [selectedWorkout, setSelectedWorkout] = useState(null); // Valgt treningsøkt i kalenderen.
 
-  const fetchWorkouts = async () => {
-    const clientParsed = client ? JSON.parse(client) : user;
-    console.log("fetch " + clientParsed.login);
-
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/api/workouts/user/${clientParsed.login}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      setWorkouts(response.data); // Anta at response.data er en array av treningsøkter
-    } catch (error) {
-      console.error("Det oppstod en feil ved henting av treningsøkter", error);
-    }
-  };
+  
+  const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(false);
+  const [openViewWorkoutModal, setOpenViewWorkoutModal] = useState(false);
+  
 
   const fetchClients = async () => {
     try {
@@ -68,12 +57,16 @@ const ClientWorkoutForm = () => {
   };
 
   useEffect(() => {
-    fetchWorkouts();
-    fetchClients(); // Hent klienter når komponenten blir rendret
-  }, [client]);
+    fetchWorkouts(client,user,setWorkouts); 
+  }, [client]); //Henter treningsøkt til clienten når den oppdateres
 
-  const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(false);
-  const [openViewWorkoutModal, setOpenViewWorkoutModal] = useState(false);
+
+  //To useeffects for å kun hente fetchClients når komponenten blir rendret og ikke hver gangs client blir oppdatert
+  useEffect(() => {
+    fetchClients();
+  }, []); // Hent klienter når komponenten blir rendret
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
