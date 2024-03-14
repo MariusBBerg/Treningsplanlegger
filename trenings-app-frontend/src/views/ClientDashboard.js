@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navigation from '../components/Navigation/Navigation';
 import ClientWorkoutForm from '../components/Workout/ClientWorkoutForm';
+import Footer from '../components/Footer';
 
 const ClientDashboard = () => {
   return (
@@ -17,7 +18,7 @@ const ClientDashboard = () => {
         </div>
         <Link to="/logout" className="text-red-600 hover:text-red-800 mt-4 transition duration-300 ease-in-out">Logg Ut</Link>
       </div>
-      
+    <Footer />
     </div>
   );
 };

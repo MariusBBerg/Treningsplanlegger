@@ -4,6 +4,7 @@ import { Container, Typography, List, ListItem, ListItemText, Button, Box } from
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import Navigation from '../components/Navigation/Navigation';
+import Footer from "../components/Footer";
 
 const ClientList = () => {
   const [clients, setClients] = useState([]);
@@ -42,7 +43,7 @@ const ClientList = () => {
 
   return (
         
-    
+    <div className="theme-bg min-h-screen flex flex-col justify-between">
     <Container sx={{ mt: 15 }}>
         <Navigation />
         <Typography variant="h4" gutterBottom>
@@ -66,6 +67,8 @@ const ClientList = () => {
         ))}
       </List>
     </Container>
+        <Footer />
+    </div>
   );
 };
 

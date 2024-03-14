@@ -54,8 +54,8 @@ export default function ProfilePage() {
 
   return (
     <div className="theme-bg min-h-screen flex flex-col justify-between" >
-      <Navigation /> {/* Legg til Navigation komponenten */}
-      <Container sx={{ mt: 15 }}>
+      <Navigation /> 
+      <Container>
         <Box
           sx={{
             display: "flex",
