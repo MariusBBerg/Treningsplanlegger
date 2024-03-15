@@ -2,7 +2,6 @@ import axios from "axios";
 
 const fetchWorkouts = async (client, user, setWorkouts) => {
   const clientParsed = client ? JSON.parse(client) : user;
-  console.log("fetch " + clientParsed.login);
 
   try {
     const response = await axios.get(

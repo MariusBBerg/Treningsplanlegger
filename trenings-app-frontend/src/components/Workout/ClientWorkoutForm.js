@@ -112,7 +112,6 @@ const ClientWorkoutForm = () => {
   };
 
   const handleEventClick = (info) => {
-    console.log('Clicked on event:', info.event);
     setSelectedWorkout(info.event);
     setOpenViewWorkoutModal(true);
   };
@@ -126,6 +125,11 @@ const ClientWorkoutForm = () => {
     return {
       id: workout.id,
       title: workout.description,
+      duration: workout.durationSeconds ? workout.durationSeconds / 60 : 60, // Konverter sekunder til minutter eller bruk 60 minutter som standard.
+      distance: workout.distance,
+      type: workout.type,
+      intensity: workout.intensityZone,
+      notes : workout.description,
       start: start,
       end: end,
       // Other event properties...

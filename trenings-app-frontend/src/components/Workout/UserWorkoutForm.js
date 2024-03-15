@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Calendar, momentLocalizer } from "react-big-calendar"; 
-import moment from "moment";
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css"; 
 import { Button, Modal, Label, Select } from "flowbite-react";
 
@@ -14,7 +15,6 @@ import fetchWorkouts from "./Hooks/workoutApi.js";
 
 
 moment.locale("nb");
-const localizer = momentLocalizer(moment); 
 
 const UserWorkoutForm = () => {
   const [date, setDate] = useState("");
@@ -78,7 +78,7 @@ const UserWorkoutForm = () => {
         },
       });
       setOpenAddWorkoutModal(false);
-      fetchWorkouts();
+      fetchWorkouts(null, user, setWorkouts);
     } catch (error) {
       console.error("Det oppstod en feil ved innsending av treningsøkt", error);
     }
@@ -124,7 +124,7 @@ const UserWorkoutForm = () => {
         }
       );
       setOpenEditWorkoutModal(false);
-      fetchWorkouts();
+      fetchWorkouts(null, user, setWorkouts);
     } catch (error) {
       console.error("Det oppstod en feil ved innsending av treningsøkt", error);
     }
@@ -134,78 +134,56 @@ const UserWorkoutForm = () => {
     return moment(date).format("YYYY-MM-DD HH:mm");
   };
 
-  const calendarEvents = workouts.map((workout) => {
-    // Konverter startdatoen til et moment-objekt for enklere håndtering.
-    const startMoment = moment(workout.date);
+  console.log(workouts)
 
-    // Bestem sluttidspunktet ved å legge til `durationSeconds` eller, som standard, 3600 sekunder (1 time).
-    const endMoment = workout.durationSeconds
-      ? startMoment.clone().add(workout.durationSeconds, "seconds")
-      : startMoment.clone().add(1, "hours"); // Legger til 1 time som standard hvis `durationSeconds` er null.
-
+  const events = workouts.map((workout) => {
+    
+    const start = moment(workout.date).format('YYYY-MM-DDTHH:mm:ss');
+    const end = moment(workout.date)
+      .add(workout.durationSeconds || 3600, 'seconds')
+      .format('YYYY-MM-DDTHH:mm:ss');
     return {
-      start: startMoment.toDate(),
-      end: endMoment.toDate(),
+      id: workout.id,
       title: workout.description,
-      type: workout.type,
-      duration: workout.durationSeconds ? workout.durationSeconds / 60 : 60, // Konverter sekunder til minutter eller bruk 60 minutter som standard.
-      distance: workout.distance,
-      intensity: workout.intensityZone,
-      notes: workout.description,
-      id : workout.id
+      start: start,
+      end: end,
+      // Other event properties...
     };
   });
 
-  const handleRangeChange = (range) => {
-    let startOfWeek;
-
-    // Sjekk om 'range' er et array (som det ofte er for ukevisning/månedsvisning)
-    if (Array.isArray(range)) {
-      startOfWeek = moment(range[0]).startOf("isoWeek");
-    } else if (range.start && range.end) {
-      // For objekter som definerer et start- og sluttpunkt
-      startOfWeek = moment(range.start).startOf("isoWeek");
-    } else {
-      // For enkeltstående datoobjekter (fallback)
-      startOfWeek = moment(range).startOf("isoWeek");
-    }
-
-    // Oppdater tilstanden med ukenummeret fra starten av uken
-    setCurrentWeek(startOfWeek.isoWeek());
+  const handleDateClick = (info) => {
+    console.log('Clicked on date:', info.dateStr);
+    // Perform any action you want here
+    const start = moment(info.date).format("YYYY-MM-DD");
+    const defaultTime = "12:00";
+    setDate(start);
+    setTime(defaultTime);
+    setOpenAddWorkoutModal(true);
   };
+
+  const handleEventClick = (info) => {
+    const tempWorkout = workouts.find(workout => workout.id === Number(info.event.id));
+    setSelectedWorkout(tempWorkout);
+    setOpenViewWorkoutModal(true);
+  };
+
+  
 
   return (
     <div>
       <label htmlFor="date">Dato:</label>
-      <Calendar
-        localizer={localizer}
-        defaultDate={new Date()}
-        onRangeChange={handleRangeChange}
-        defaultView="week"
-        events={calendarEvents} // Bruk den formaterte listen av treningsøkter her
-        style={{ height: "500px" }}
-        selectable={true}
-        onSelectSlot={({ start }) => {
-          if (moment(start).format("HH:mm") === "00:00") {
-            // Sett standardtid til 12:00 midtpå dagen
-            const formattedDate = moment(start).format("YYYY-MM-DD");
-            const defaultTime = "12:00";
-            setDate(formattedDate);
-            setTime(defaultTime);
-          } else {
-            // Hvis en spesifikk tid allerede er valgt (for eksempel i dags- eller ukesvisning), bruk den valgte tiden
-            const formattedDate = moment(start).format("YYYY-MM-DD");
-            const formattedTime = moment(start).format("HH:mm");
-            setDate(formattedDate);
-            setTime(formattedTime);
-          }
-          setOpenAddWorkoutModal(true);
+      <FullCalendar
+        plugins={[dayGridPlugin, interactionPlugin]}
+        initialView="dayGridMonth"
+        weekends={true}
+        events={events}
+        dateClick={handleDateClick} // Add date click handler
+        eventClick={handleEventClick} // Add event click handler
+        eventTimeFormat={{
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
         }}
-        onSelectEvent={(event) => {
-          setSelectedWorkout(event);
-          setOpenViewWorkoutModal(true); // Åpne modalen for å vise en eksisterende treningsøkt
-        }}
-        scrollToTime={moment().set({ h: 9, m: 0 }).toDate()}
       />
 
       <Modal
@@ -350,14 +328,14 @@ const UserWorkoutForm = () => {
       >
         <Modal.Body>
           {selectedWorkout && (
-            console.log(selectedWorkout),
+            console.log(selectedWorkout.type),
             <div className="space-y-6">
               <div className="max-w-md py-2">
                 <h2 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
                   {selectedWorkout.title}
                 </h2>
                 <p className="text-sm text-gray-900 dark:text-white">
-                  Dato: {formatDate(selectedWorkout.start)}
+                  Dato: {formatDate(selectedWorkout.date)}
                 </p>
                 <p className="text-sm text-gray-900 dark:text-white">
                   Type: {selectedWorkout.type}
@@ -371,7 +349,7 @@ const UserWorkoutForm = () => {
                       Distanse: {selectedWorkout.distance} km
                     </p>
                     <p className="text-sm text-gray-900 dark:text-white">
-                      Intensitet: Sone {selectedWorkout.intensity}
+                      Intensitet: Sone {selectedWorkout.intensityZone}
                     </p>
                   </>
                 )}
