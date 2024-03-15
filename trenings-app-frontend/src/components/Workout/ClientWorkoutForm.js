@@ -161,7 +161,11 @@ const ClientWorkoutForm = () => {
         events={events}
         dateClick={handleDateClick} // Add date click handler
         eventClick={handleEventClick} // Add event click handler
-        
+        eventTimeFormat={{
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        }}
       />
 
 <Modal
