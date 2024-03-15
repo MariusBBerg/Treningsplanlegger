@@ -6,6 +6,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css"; 
 import { Button, Modal, Label, Select } from "flowbite-react";
+import FullCalendarComponent from "./FullCalendarComponent.js";
 
 import "moment/locale/nb"; 
 
@@ -136,55 +137,23 @@ const UserWorkoutForm = () => {
 
   console.log(workouts)
 
-  const events = workouts.map((workout) => {
-    
-    const start = moment(workout.date).format('YYYY-MM-DDTHH:mm:ss');
-    const end = moment(workout.date)
-      .add(workout.durationSeconds || 3600, 'seconds')
-      .format('YYYY-MM-DDTHH:mm:ss');
-    return {
-      id: workout.id,
-      title: workout.description,
-      start: start,
-      end: end,
-      // Other event properties...
-    };
-  });
 
-  const handleDateClick = (info) => {
-    console.log('Clicked on date:', info.dateStr);
-    // Perform any action you want here
-    const start = moment(info.date).format("YYYY-MM-DD");
-    const defaultTime = "12:00";
-    setDate(start);
-    setTime(defaultTime);
-    setOpenAddWorkoutModal(true);
-  };
 
-  const handleEventClick = (info) => {
-    const tempWorkout = workouts.find(workout => workout.id === Number(info.event.id));
-    setSelectedWorkout(tempWorkout);
-    setOpenViewWorkoutModal(true);
-  };
 
+
+  
   
 
   return (
     <div>
       <label htmlFor="date">Dato:</label>
-      <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        weekends={true}
-        events={events}
-        dateClick={handleDateClick} // Add date click handler
-        eventClick={handleEventClick} // Add event click handler
-        eventTimeFormat={{
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        }}
-      />
+      <FullCalendarComponent workouts={workouts} setDate={setDate}
+        setTime={setTime}
+        setOpenAddWorkoutModal={setOpenAddWorkoutModal}
+        setOpenViewWorkoutModal = {setOpenViewWorkoutModal}
+        setSelectedWorkout={setSelectedWorkout}
+         />
+
 
       <Modal
         show={openAddWorkoutModal}
@@ -328,7 +297,6 @@ const UserWorkoutForm = () => {
       >
         <Modal.Body>
           {selectedWorkout && (
-            console.log(selectedWorkout.type),
             <div className="space-y-6">
               <div className="max-w-md py-2">
                 <h2 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
