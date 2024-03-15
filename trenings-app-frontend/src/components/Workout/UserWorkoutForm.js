@@ -1,23 +1,28 @@
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Calendar, momentLocalizer } from "react-big-calendar"; 
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
 import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css"; 
+import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Button, Modal, Label, Select } from "flowbite-react";
+import FullCalendarComponent from "./FullCalendarComponent.js";
 
-import "moment/locale/nb"; 
+import "moment/locale/nb";
 
-import WeeklyRunningVolume from "./WeeklyRunningVolume.js"; 
+import WeeklyRunningVolume from "./WeeklyRunningVolume.js";
 
-import fetchWorkouts from "./Hooks/workoutApi.js"; 
-
+import {
+  fetchWorkouts,
+  handleSubmitEdit,
+  handleSubmit,
+} from "./Hooks/workoutApi.js";
 
 moment.locale("nb");
-const localizer = momentLocalizer(moment); 
 
 const UserWorkoutForm = () => {
   const [date, setDate] = useState("");
+  const [name, setName] = useState("");
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
@@ -31,181 +36,29 @@ const UserWorkoutForm = () => {
   const [workouts, setWorkouts] = useState([]);
   const [selectedWorkout, setSelectedWorkout] = useState(""); // // Valgt treningsøkt i kalenderen
 
-  
-
   useEffect(() => {
-    fetchWorkouts(null,user, setWorkouts);
+    fetchWorkouts(null, user, setWorkouts);
   }, [user.login]); //ENDRES HVER GANG BRUKER-OBJEKTET
 
   const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(false);
   const [openViewWorkoutModal, setOpenViewWorkoutModal] = useState(false);
   const [openEditWorkoutModal, setOpenEditWorkoutModal] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Sjekk at user og user.token eksisterer
-    if (!user || !user.token) {
-      console.error("Bruker er ikke autentisert.");
-      // Legg til logikk for å håndtere ikke-autentiserte brukere, f.eks. omdiriger til login
-      return;
-    }
-
-    const durationInSeconds =
-      type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
-
-    const dateTime = moment(
-      `${date} ${time}`,
-      "YYYY-MM-DD HH:mm"
-    ).toISOString();
-
-    const workoutData = {
-      date: dateTime,
-      description,
-      type,
-      distance: type === "Løping" ? parseFloat(distance) : undefined,
-      durationSeconds: durationInSeconds, // Bruk den konverterte varigheten i sekunder
-      intensityZone: type === "Løping" ? parseInt(zone, 10) : undefined,
-    };
-
-    try {
-      await axios.post("http://localhost:8080/api/workouts", workoutData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`, // Bruker token fra auth context
-        },
-        params: {
-          clientLogin: user.login,
-        },
-      });
-      setOpenAddWorkoutModal(false);
-      fetchWorkouts();
-    } catch (error) {
-      console.error("Det oppstod en feil ved innsending av treningsøkt", error);
-    }
-  };
-
-  const handleSumbitEdit = async (e) => {
-    e.preventDefault();
-
-    
-    if (!user || !user.token) {
-      console.error("Bruker er ikke autentisert.");
-      return;
-    }
-
-    const durationInSeconds =
-      type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
-
-    const dateTime = moment(
-      `${date} ${time}`,
-      "YYYY-MM-DD HH:mm"
-    ).toISOString();
-
-    const workoutData = {
-      date: dateTime,
-      description,
-      type,
-      distance: type === "Løping" ? parseFloat(distance) : undefined,
-      durationSeconds: durationInSeconds, 
-      intensityZone: type === "Løping" ? parseInt(zone, 10) : undefined,
-    };
-
-    try {
-      await axios.put(
-        `http://localhost:8080/api/workouts/${selectedWorkout.id}`, 
-        workoutData,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`, 
-          },
-          params: {
-            clientLogin: user.login,
-          },
-        }
-      );
-      setOpenEditWorkoutModal(false);
-      fetchWorkouts();
-    } catch (error) {
-      console.error("Det oppstod en feil ved innsending av treningsøkt", error);
-    }
-  };
-
   const formatDate = (date) => {
     return moment(date).format("YYYY-MM-DD HH:mm");
-  };
-
-  const calendarEvents = workouts.map((workout) => {
-    // Konverter startdatoen til et moment-objekt for enklere håndtering.
-    const startMoment = moment(workout.date);
-
-    // Bestem sluttidspunktet ved å legge til `durationSeconds` eller, som standard, 3600 sekunder (1 time).
-    const endMoment = workout.durationSeconds
-      ? startMoment.clone().add(workout.durationSeconds, "seconds")
-      : startMoment.clone().add(1, "hours"); // Legger til 1 time som standard hvis `durationSeconds` er null.
-
-    return {
-      start: startMoment.toDate(),
-      end: endMoment.toDate(),
-      title: workout.description,
-      type: workout.type,
-      duration: workout.durationSeconds ? workout.durationSeconds / 60 : 60, // Konverter sekunder til minutter eller bruk 60 minutter som standard.
-      distance: workout.distance,
-      intensity: workout.intensityZone,
-      notes: workout.description,
-      id : workout.id
-    };
-  });
-
-  const handleRangeChange = (range) => {
-    let startOfWeek;
-
-    // Sjekk om 'range' er et array (som det ofte er for ukevisning/månedsvisning)
-    if (Array.isArray(range)) {
-      startOfWeek = moment(range[0]).startOf("isoWeek");
-    } else if (range.start && range.end) {
-      // For objekter som definerer et start- og sluttpunkt
-      startOfWeek = moment(range.start).startOf("isoWeek");
-    } else {
-      // For enkeltstående datoobjekter (fallback)
-      startOfWeek = moment(range).startOf("isoWeek");
-    }
-
-    // Oppdater tilstanden med ukenummeret fra starten av uken
-    setCurrentWeek(startOfWeek.isoWeek());
   };
 
   return (
     <div>
       <label htmlFor="date">Dato:</label>
-      <Calendar
-        localizer={localizer}
-        defaultDate={new Date()}
-        onRangeChange={handleRangeChange}
-        defaultView="week"
-        events={calendarEvents} // Bruk den formaterte listen av treningsøkter her
-        style={{ height: "500px" }}
-        selectable={true}
-        onSelectSlot={({ start }) => {
-          if (moment(start).format("HH:mm") === "00:00") {
-            // Sett standardtid til 12:00 midtpå dagen
-            const formattedDate = moment(start).format("YYYY-MM-DD");
-            const defaultTime = "12:00";
-            setDate(formattedDate);
-            setTime(defaultTime);
-          } else {
-            // Hvis en spesifikk tid allerede er valgt (for eksempel i dags- eller ukesvisning), bruk den valgte tiden
-            const formattedDate = moment(start).format("YYYY-MM-DD");
-            const formattedTime = moment(start).format("HH:mm");
-            setDate(formattedDate);
-            setTime(formattedTime);
-          }
-          setOpenAddWorkoutModal(true);
-        }}
-        onSelectEvent={(event) => {
-          setSelectedWorkout(event);
-          setOpenViewWorkoutModal(true); // Åpne modalen for å vise en eksisterende treningsøkt
-        }}
-        scrollToTime={moment().set({ h: 9, m: 0 }).toDate()}
+      <FullCalendarComponent
+        workouts={workouts}
+        setDate={setDate}
+        setTime={setTime}
+        setOpenAddWorkoutModal={setOpenAddWorkoutModal}
+        setOpenViewWorkoutModal={setOpenViewWorkoutModal}
+        setSelectedWorkout={setSelectedWorkout}
+        setCurrentWeek={setCurrentWeek}
       />
 
       <Modal
@@ -215,7 +68,41 @@ const UserWorkoutForm = () => {
         <Modal.Header>Add Workout</Modal.Header>
         <Modal.Body>
           <div className="space-y-6">
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+
+                const durationInSeconds =
+                  type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
+
+                const dateTime = moment(
+                  `${date} ${time}`,
+                  "YYYY-MM-DD HH:mm"
+                ).toISOString();
+
+                const workoutData = {
+                  date: dateTime,
+                  name,
+                  description,
+                  type,
+                  distance:
+                    type === "Løping" ? parseFloat(distance) : undefined,
+                  durationSeconds: durationInSeconds,
+                  intensityZone:
+                    type === "Løping" ? parseInt(zone, 10) : undefined,
+                };
+
+                handleSubmit(
+                  e,
+                  null,
+                  user,
+                  setWorkouts,
+                  workoutData,
+                  setOpenAddWorkoutModal
+                );
+              }}
+            >
+              {" "}
               <div className="max-w-md py-2">
                 <div className="mb-2 block">
                   <Label htmlFor="type">Type:</Label>
@@ -223,6 +110,7 @@ const UserWorkoutForm = () => {
                 <Select
                   id="type"
                   value={type}
+                  required 
                   onChange={(e) => setType(e.target.value)}
                 >
                   <option value="">Velg en type</option>
@@ -230,6 +118,23 @@ const UserWorkoutForm = () => {
                   <option value="Styrke">Styrke</option>
                   <option value="Cardio">Cardio</option>
                 </Select>
+                <div className="max-w-sm py-2">
+                    <label
+                      htmlFor="name"
+                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                    >
+                      Name:
+                    </label>
+                    <input
+                      type="text"
+                      required 
+                      id="distance"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                
+              </div>
               </div>
               {type === "Løping" && (
                 <>
@@ -285,7 +190,6 @@ const UserWorkoutForm = () => {
                   </div>
                 </>
               )}
-
               <div className="max-w-sm py-2">
                 <label
                   htmlFor="description"
@@ -300,7 +204,6 @@ const UserWorkoutForm = () => {
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
-
               <div className="max-w-sm py-2">
                 <label
                   htmlFor="date"
@@ -316,7 +219,6 @@ const UserWorkoutForm = () => {
                   onChange={(e) => setDate(e.target.value)}
                 />
               </div>
-
               <div className="max-w-sm py-2">
                 <label
                   htmlFor="time"
@@ -332,7 +234,6 @@ const UserWorkoutForm = () => {
                   onChange={(e) => setTime(e.target.value)} // Antar at du har en setTime-funksjon i din useState hooks
                 />
               </div>
-
               <Button type="submit">Add Workout</Button>
             </form>
           </div>
@@ -350,14 +251,13 @@ const UserWorkoutForm = () => {
       >
         <Modal.Body>
           {selectedWorkout && (
-            console.log(selectedWorkout),
             <div className="space-y-6">
               <div className="max-w-md py-2">
                 <h2 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-                  {selectedWorkout.title}
+                  {selectedWorkout.name}
                 </h2>
                 <p className="text-sm text-gray-900 dark:text-white">
-                  Dato: {formatDate(selectedWorkout.start)}
+                  Dato: {formatDate(selectedWorkout.date)}
                 </p>
                 <p className="text-sm text-gray-900 dark:text-white">
                   Type: {selectedWorkout.type}
@@ -371,7 +271,7 @@ const UserWorkoutForm = () => {
                       Distanse: {selectedWorkout.distance} km
                     </p>
                     <p className="text-sm text-gray-900 dark:text-white">
-                      Intensitet: Sone {selectedWorkout.intensity}
+                      Intensitet: Sone {selectedWorkout.intensityZone}
                     </p>
                   </>
                 )}
@@ -397,7 +297,6 @@ const UserWorkoutForm = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <WeeklyRunningVolume client={user} week={currentWeek} />
 
       <Modal
         show={openEditWorkoutModal}
@@ -409,7 +308,34 @@ const UserWorkoutForm = () => {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleSumbitEdit(e, selectedWorkout.id);
+                const durationInSeconds =
+                  type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
+
+                const dateTime = moment(
+                  `${date} ${time}`,
+                  "YYYY-MM-DD HH:mm"
+                ).toISOString();
+
+                const workoutData = {
+                  date: dateTime,
+                  name,
+                  description,
+                  type,
+                  distance:
+                    type === "Løping" ? parseFloat(distance) : undefined,
+                  durationSeconds: durationInSeconds, // Bruk den konverterte varigheten i sekunder
+                  intensityZone:
+                    type === "Løping" ? parseInt(zone, 10) : undefined,
+                };
+                handleSubmitEdit(
+                  e,
+                  null,
+                  user,
+                  selectedWorkout,
+                  setOpenEditWorkoutModal,
+                  setWorkouts,
+                  workoutData
+                );
               }}
             >
               {" "}
@@ -427,6 +353,23 @@ const UserWorkoutForm = () => {
                   <option value="Styrke">Styrke</option>
                   <option value="Cardio">Cardio</option>
                 </Select>
+                <div className="max-w-sm py-2">
+                    <label
+                      htmlFor="name"
+                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                    >
+                      Name:
+                    </label>
+                    <input
+                      type="text"
+                      required 
+                      id="distance"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                
+              </div>
               </div>
               {type === "Løping" && (
                 <>
@@ -536,6 +479,11 @@ const UserWorkoutForm = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <WeeklyRunningVolume
+        client={user}
+        week={currentWeek}
+        workouts={workouts}
+      />
     </div>
   );
 };

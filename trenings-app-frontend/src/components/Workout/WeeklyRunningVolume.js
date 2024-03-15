@@ -5,7 +5,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
-const WeeklyRunningVolume = ({ client, week }) => {
+const WeeklyRunningVolume = ({ client, week,workouts }) => {
   const [weeklyVolume, setWeeklyVolume] = useState(0);
   // Legg til state for å holde på start- og sluttdatoene for uken
   const [weekRange, setWeekRange] = useState({ start: '', end: '' });
@@ -23,13 +23,9 @@ const WeeklyRunningVolume = ({ client, week }) => {
       end: endOfWeek.format('DD MMM'),
     });
 
-    const response = await axios.get(`http://localhost:8080/api/workouts/user/${client.login}`, {
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
+  
 
-    const volume = response.data
+    const volume = workouts
       .filter(workout => {
         const workoutDate = moment(workout.date);
         return (
