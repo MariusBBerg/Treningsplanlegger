@@ -26,6 +26,7 @@ public class WorkoutService {
         workout.setType(workoutDto.getType());
         workout.setDescription(workoutDto.getDescription());
         workout.setDate(workoutDto.getDate());
+        workout.setName(workoutDto.getName());
         
         if ("Løping".equals(workoutDto.getType()) && workoutDto.getDistance() != null && workoutDto.getDurationSeconds() != null && workoutDto.getDistance() > 0 && workoutDto.getDurationSeconds() > 0 && workoutDto.getIntensityZone() >0) {
             workout.setDistance(workoutDto.getDistance());

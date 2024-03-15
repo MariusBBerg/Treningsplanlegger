@@ -32,12 +32,14 @@ public class Workout {
 
     private Date date;
 
+    private String name;
     private String description;
     private String type;
-
+    
     private Double distance; // Distanse i kilometer, kan være null for ikke-løpeaktiviteter
     private Long durationSeconds;
     private Integer intensityZone;
+    
 
     public Workout() {
     }

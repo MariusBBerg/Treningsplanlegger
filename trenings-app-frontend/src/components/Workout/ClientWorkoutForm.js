@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin from "@fullcalendar/interaction";
+
 import moment from "moment";
 import "moment/locale/nb";
 import { Button, Modal, Label, Select } from "flowbite-react";
 import WeeklyRunningVolume from "./WeeklyRunningVolume.js";
-import fetchWorkouts from "./Hooks/workoutApi.js";
+import {
+  fetchWorkouts,
+  handleSubmitEdit,
+  handleSubmit,
+} from "./Hooks/workoutApi.js";
 
+import FullCalendarComponent from "./FullCalendarComponent.js";
 moment.locale("nb");
 
 const ClientWorkoutForm = () => {
   const [date, setDate] = useState("");
+  const [name,setName] = useState("")
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
@@ -31,7 +35,6 @@ const ClientWorkoutForm = () => {
   const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(false);
   const [openViewWorkoutModal, setOpenViewWorkoutModal] = useState(false);
   const [openEditWorkoutModal, setOpenEditWorkoutModal] = useState(false);
-
 
   const fetchClients = async () => {
     try {
@@ -57,137 +60,9 @@ const ClientWorkoutForm = () => {
     fetchClients();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!user || !user.token) {
-      console.error("User is not authenticated.");
-      return;
-    }
-
-    const durationInSeconds =
-      type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
-
-    const dateTime = moment(
-      `${date} ${time}`,
-      "YYYY-MM-DD HH:mm"
-    ).toISOString();
-
-    const workoutData = {
-      date: dateTime,
-      description,
-      type,
-      distance: type === "Løping" ? parseFloat(distance) : undefined,
-      durationSeconds: durationInSeconds,
-      intensityZone: type === "Løping" ? parseInt(zone, 10) : undefined,
-    };
-    const clientParsed = client ? JSON.parse(client) : user;
-    console.log("set " + clientParsed.login);
-    try {
-      await axios.post("http://localhost:8080/api/workouts", workoutData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        params: {
-          clientLogin: clientParsed.login,
-        },
-      });
-      setOpenAddWorkoutModal(false);
-      fetchWorkouts(client, user, setWorkouts);
-    } catch (error) {
-      console.error("An error occurred while submitting the workout", error);
-    }
-  };
-
-
-  const handleSumbitEdit = async (e) => {
-    e.preventDefault();
-
-    
-    if (!user || !user.token) {
-      console.error("Bruker er ikke autentisert.");
-      return;
-    }
-
-    const durationInSeconds =
-      type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
-
-    const dateTime = moment(
-      `${date} ${time}`,
-      "YYYY-MM-DD HH:mm"
-    ).toISOString();
-
-    const workoutData = {
-      date: dateTime,
-      description,
-      type,
-      distance: type === "Løping" ? parseFloat(distance) : undefined,
-      durationSeconds: durationInSeconds, 
-      intensityZone: type === "Løping" ? parseInt(zone, 10) : undefined,
-    };
-
-    try {
-      await axios.put(
-        `http://localhost:8080/api/workouts/${selectedWorkout.id}`, 
-        workoutData,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`, 
-          },
-          params: {
-            clientLogin: user.login,
-          },
-        }
-      );
-      setOpenEditWorkoutModal(false);
-      fetchWorkouts(client, user, setWorkouts);
-    } catch (error) {
-      console.error("Det oppstod en feil ved innsending av treningsøkt", error);
-    }
-  };
-
   const formatDate = (date) => {
     return moment(date).format("YYYY-MM-DD HH:mm");
   };
-
-  const handleDateClick = (info) => {
-    console.log("Clicked on date:", info.dateStr);
-    // Perform any action you want here
-    const start = moment(info.date).format("YYYY-MM-DD");
-    const defaultTime = "12:00";
-    setDate(start);
-    setTime(defaultTime);
-    setOpenAddWorkoutModal(true);
-  };
-
-  const handleEventClick = (info) => {
-    const tempWorkout = workouts.find(
-      (workout) => workout.id === Number(info.event.id)
-    );
-    setSelectedWorkout(tempWorkout);
-    setOpenViewWorkoutModal(true);
-  };
-
-  const events = workouts.map((workout) => {
-    const start = moment(workout.date).format("YYYY-MM-DDTHH:mm:ss");
-    const end = moment(workout.date)
-      .add(workout.durationSeconds || 3600, "seconds")
-      .format("YYYY-MM-DDTHH:mm:ss");
-
-    return {
-      id: workout.id,
-      title: workout.description,
-      duration: workout.durationSeconds ? workout.durationSeconds / 60 : 60, // Konverter sekunder til minutter eller bruk 60 minutter som standard.
-      distance: workout.distance,
-      type: workout.type,
-      intensity: workout.intensityZone,
-      notes: workout.description,
-      start: start,
-      end: end,
-
-      // Other event properties...
-    };
-  });
 
   return (
     <div>
@@ -211,18 +86,14 @@ const ClientWorkoutForm = () => {
         </div>
       </div>
 
-      <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        weekends={true}
-        events={events}
-        dateClick={handleDateClick} // Add date click handler
-        eventClick={handleEventClick} // Add event click handler
-        eventTimeFormat={{
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        }}
+      <FullCalendarComponent
+        workouts={workouts}
+        setDate={setDate}
+        setTime={setTime}
+        setOpenAddWorkoutModal={setOpenAddWorkoutModal}
+        setOpenViewWorkoutModal={setOpenViewWorkoutModal}
+        setSelectedWorkout={setSelectedWorkout}
+        setCurrentWeek={setCurrentWeek}
       />
 
       <Modal
@@ -232,7 +103,39 @@ const ClientWorkoutForm = () => {
         <Modal.Header>Add Workout</Modal.Header>
         <Modal.Body>
           <div className="space-y-6">
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+
+                const durationInSeconds =
+                  type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
+
+                const dateTime = moment(
+                  `${date} ${time}`,
+                  "YYYY-MM-DD HH:mm"
+                ).toISOString();
+
+                const workoutData = {
+                  date: dateTime,
+                  description,
+                  type,
+                  distance:
+                    type === "Løping" ? parseFloat(distance) : undefined,
+                  durationSeconds: durationInSeconds,
+                  intensityZone:
+                    type === "Løping" ? parseInt(zone, 10) : undefined,
+                };
+
+                handleSubmit(
+                  e,
+                  client,
+                  user,
+                  setWorkouts,
+                  workoutData,
+                  setOpenAddWorkoutModal
+                );
+              }}
+            >
               <div className="max-w-md py-2">
                 <div className="mb-2 block">
                   <Label htmlFor="type">Type:</Label>
@@ -247,6 +150,23 @@ const ClientWorkoutForm = () => {
                   <option value="Styrke">Styrke</option>
                   <option value="Cardio">Cardio</option>
                 </Select>
+                <div className="max-w-sm py-2">
+                    <label
+                      htmlFor="name"
+                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                    >
+                      Name:
+                    </label>
+                    <input
+                      type="text"
+                      required 
+                      id="distance"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                
+              </div>
               </div>
               {type === "Løping" && (
                 <>
@@ -372,7 +292,7 @@ const ClientWorkoutForm = () => {
               <div className="space-y-6">
                 <div className="max-w-md py-2">
                   <h2 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-                    {selectedWorkout.title}
+                    {selectedWorkout.name}
                   </h2>
                   <p className="text-sm text-gray-900 dark:text-white">
                     Dato: {formatDate(selectedWorkout.start)}
@@ -409,7 +329,6 @@ const ClientWorkoutForm = () => {
             onClick={() => {
               setOpenViewWorkoutModal(false);
               setOpenEditWorkoutModal(true);
-
             }}
           >
             Edit
@@ -427,7 +346,34 @@ const ClientWorkoutForm = () => {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleSumbitEdit(e, selectedWorkout.id);
+                const durationInSeconds =
+                  type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
+
+                const dateTime = moment(
+                  `${date} ${time}`,
+                  "YYYY-MM-DD HH:mm"
+                ).toISOString();
+
+                const workoutData = {
+                  date: dateTime,
+                  name,
+                  description,
+                  type,
+                  distance:
+                    type === "Løping" ? parseFloat(distance) : undefined,
+                  durationSeconds: durationInSeconds, // Bruk den konverterte varigheten i sekunder
+                  intensityZone:
+                    type === "Løping" ? parseInt(zone, 10) : undefined,
+                };
+                handleSubmitEdit(
+                  e,
+                  client,
+                  user,
+                  selectedWorkout,
+                  setOpenEditWorkoutModal,
+                  setWorkouts,
+                  workoutData
+                );
               }}
             >
               {" "}
@@ -435,15 +381,29 @@ const ClientWorkoutForm = () => {
                 <div className="mb-2 block">
                   <Label htmlFor="type">Type:</Label>
                 </div>
-                <Select
-                  id="type"
-                  onChange={(e) => setType(e.target.value)}
-                >
+                <Select id="type" onChange={(e) => setType(e.target.value)}>
                   <option value="">Velg en type</option>
                   <option value="Løping">Løping</option>
                   <option value="Styrke">Styrke</option>
                   <option value="Cardio">Cardio</option>
                 </Select>
+                <div className="max-w-sm py-2">
+                    <label
+                      htmlFor="name"
+                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                    >
+                      Name:
+                    </label>
+                    <input
+                      type="text"
+                      required 
+                      id="distance"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                
+              </div>
               </div>
               {type === "Løping" && (
                 <>
@@ -554,7 +514,11 @@ const ClientWorkoutForm = () => {
         </Modal.Footer>
       </Modal>
 
-      <WeeklyRunningVolume client={user} week={currentWeek} />
+      <WeeklyRunningVolume
+        client={client}
+        week={currentWeek}
+        workouts={workouts}
+      />
     </div>
   );
 };

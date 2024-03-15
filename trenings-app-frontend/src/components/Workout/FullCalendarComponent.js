@@ -12,10 +12,13 @@ const FullCalendarComponent = ({
   setOpenViewWorkoutModal,
   workouts,
   setSelectedWorkout,
+  setCurrentWeek,
 
 }) => {
   const calendarRef = useRef(null);
   const [calendar, setCalendar] = useState(null);
+  const [currentView, setCurrentView] = useState('dayGridMonth');
+  
 
   useEffect(() => {
 
@@ -27,10 +30,10 @@ const FullCalendarComponent = ({
         .format('YYYY-MM-DDTHH:mm:ss');
       return {
         id: workout.id,
-        title: workout.description,
+        title: workout.name,
         start: start,
         end: end,
-        // Other event properties...
+        
       };
     });
 
@@ -47,6 +50,8 @@ const FullCalendarComponent = ({
       dateClick: handleDateClick,
       eventClick: handleEventClick,
       firstDay: 1,
+      datesSet: handleDatesSet,
+
     });
 
     calendarInstance.render();
@@ -57,15 +62,22 @@ const FullCalendarComponent = ({
     };
   }, [workouts]);
 
+  
+useEffect(() => {
+  if (calendar) {
+    calendar.setOption('datesSet', handleDatesSet);
+  }
+}, [currentView]);
+
   const handleViewChange = (viewName) => {
     if (calendar) {
       calendar.changeView(viewName);
+      setCurrentView(viewName);
     }
   };
 
   const handleDateClick = (info) => {
     console.log('Clicked on date:', info.dateStr);
-    // Perform any action you want here
     const start = moment(info.date).format("YYYY-MM-DD");
     const defaultTime = "12:00";
     setDate(start);
@@ -78,18 +90,44 @@ const FullCalendarComponent = ({
     setSelectedWorkout(tempWorkout);
     setOpenViewWorkoutModal(true);
   };
+  const handleDatesSet = (info) => {
+    console.log(currentView);
+    if (currentView !== "timeGridWeek") {
+      setCurrentWeek(moment().isoWeek());
+    } else {
+      setCurrentWeek(moment(info.start).isoWeek());
+    }  };
 
   return (
     <div>
-      <div>
-        <button onClick={() => handleViewChange("dayGridMonth")}>
-          Monthly
-        </button>
-        <button onClick={() => handleViewChange("timeGridWeek")}>Weekly</button>
-        <button onClick={() => handleViewChange("timeGridDay")}>Daily</button>
-      </div>
-      <div ref={calendarRef}></div>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'flex-end', // Aligns items to the right
+      marginBottom: '10px' // Adds some space below the buttons
+    }}>
+      <button 
+        onClick={() => handleViewChange("dayGridMonth")}
+        className={`bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded mr-2 ${currentView === 'dayGridMonth' ? 'bg-slate-900' : ''}`}
+      >
+        Monthly
+      </button>
+      <button 
+        onClick={() => handleViewChange("timeGridWeek")}
+        className={`bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded mr-2 ${currentView === 'timeGridWeek' ? 'bg-slate-900' : ''}`}
+      >
+        Weekly
+      </button>
+      <button 
+        onClick={() => handleViewChange("timeGridDay")}
+        className={`bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded ${currentView === 'timeGridDay' ? 'bg-slate-900' : ''}`}
+        >
+
+      
+        Daily
+      </button>
     </div>
+    <div ref={calendarRef}></div>
+  </div>
   );
 };
 

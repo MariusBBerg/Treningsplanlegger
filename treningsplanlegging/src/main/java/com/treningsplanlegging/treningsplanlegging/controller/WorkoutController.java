@@ -103,6 +103,7 @@ public class WorkoutController {
         currentWorkout.setType(workoutDto.getType());
         currentWorkout.setDescription(workoutDto.getDescription());
         currentWorkout.setDate(workoutDto.getDate());
+        currentWorkout.setName(workoutDto.getName());
         if ("Løping".equals(workoutDto.getType()) && workoutDto.getDistance() != null && workoutDto.getDurationSeconds() != null && workoutDto.getDistance() > 0 && workoutDto.getDurationSeconds() > 0 ) {
             currentWorkout.setDistance(workoutDto.getDistance());
             currentWorkout.setDurationSeconds(workoutDto.getDurationSeconds());
