@@ -11,8 +11,7 @@ import {
 import Navigation from '../components/Navigation/Navigation';
 import axios from "axios";
 import Footer from "../components/Footer";
-import API_URL from "../services/apiUrl";
-
+import { API_URL } from "../utils/api_url";
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
   const userStr = localStorage.getItem("user");

@@ -1,5 +1,5 @@
 import axios from "axios";
-import API_URL from "../../services/apiService";
+import { API_URL } from "../../../utils/api_url";
 const fetchWorkouts = async (client, user, setWorkouts) => {
   const clientParsed = client ? JSON.parse(client) : user;
 

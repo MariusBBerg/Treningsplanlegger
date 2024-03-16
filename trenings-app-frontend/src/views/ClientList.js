@@ -5,8 +5,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import Navigation from '../components/Navigation/Navigation';
 import Footer from "../components/Footer";
-import API_URL from "../services/apiUrl";
-
+import { API_URL } from "../utils/api_url";
 const ClientList = () => {
   const [clients, setClients] = useState([]);
   const userStr = localStorage.getItem("user");

@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CardActions from "@mui/material/CardActions";
-import API_URL from "../services/apiUrl";
+import { API_URL } from "../utils/api_url";
 import Navigation from "../components/Navigation/Navigation"; // Sørg for at denne linjen er korrekt importert
 import Footer from "../components/Footer";
 

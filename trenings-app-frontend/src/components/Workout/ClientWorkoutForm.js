@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import API_URL from "../../services/authService.js";
+import { API_URL } from "../../utils/api_url.js";
 import moment from "moment";
 import "moment/locale/nb";
 import { Button, Modal, Label, Select } from "flowbite-react";
