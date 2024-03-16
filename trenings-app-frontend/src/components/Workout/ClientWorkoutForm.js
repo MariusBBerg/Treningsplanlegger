@@ -117,6 +117,7 @@ const ClientWorkoutForm = () => {
 
                 const workoutData = {
                   date: dateTime,
+                  name,
                   description,
                   type,
                   distance:

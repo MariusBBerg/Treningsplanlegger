@@ -7,6 +7,7 @@ import com.treningsplanlegging.treningsplanlegging.dto.SignUpDto;
 import com.treningsplanlegging.treningsplanlegging.dto.UserDto;
 import com.treningsplanlegging.treningsplanlegging.entity.User;
 
+
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
@@ -17,6 +18,7 @@ public interface UserMapper {
     @Mapping(target = "coach", ignore = true)
     @Mapping(target = "clients", ignore = true)
     UserDto toUserDto(User user);
+
 
 
     
