@@ -11,6 +11,7 @@ import {
 import Navigation from '../components/Navigation/Navigation';
 import axios from "axios";
 import Footer from "../components/Footer";
+import API_URL from "../services/apiUrl";
 
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
@@ -33,7 +34,7 @@ export default function ProfilePage() {
     };
     try {
       const response = await axios.put(
-        "http://localhost:8080/api/users/me",
+        API_URL + "api/users/me",
         userData,
         {
           headers: {

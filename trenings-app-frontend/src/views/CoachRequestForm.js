@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CardActions from "@mui/material/CardActions";
-
+import API_URL from "../services/apiUrl";
 import Navigation from "../components/Navigation/Navigation"; // Sørg for at denne linjen er korrekt importert
 import Footer from "../components/Footer";
 
@@ -31,7 +31,7 @@ const CoachRequestForm = () => {
   const searchUsers = async (searchTerm) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/users/search`,
+        API_URL + `api/users/search`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -58,7 +58,7 @@ const CoachRequestForm = () => {
   const fetchRequests = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/coach-requests/user/${user.id}/requests`,
+        API_URL + `api/coach-requests/user/${user.id}/requests`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -75,7 +75,7 @@ const CoachRequestForm = () => {
   const sendRequest = async (userId) => {
     try {
       await axios.post(
-        `http://localhost:8080/api/coach-requests/user/${user.id}/request/${userId}`,
+        API_URL + `api/coach-requests/user/${user.id}/request/${userId}`,
         {},
         {
           headers: {
@@ -94,7 +94,7 @@ const CoachRequestForm = () => {
   const respondToRequest = async (requestId, response) => {
     try {
       await axios.post(
-        `http://localhost:8080/api/coach-requests/request/${requestId}/response`,
+        API_URL + `api/coach-requests/request/${requestId}/response`,
         response,
         {
           headers: {
