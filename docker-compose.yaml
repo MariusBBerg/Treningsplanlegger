@@ -21,8 +21,6 @@ services:
       - 8080:8080
     env_file:
       - .env
-    environment:
-      db-url: jdbc:postgresql://db:5432/treningsplanleggingdb
     depends_on:
       - db
     volumes:
