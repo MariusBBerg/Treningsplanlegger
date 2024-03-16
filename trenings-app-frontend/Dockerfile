@@ -4,6 +4,7 @@ FROM node:18.17.1-alpine3.18
 COPY package.json package-lock.json .
 
 RUN npm install
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 ENV NODE_OPTIONS="--max-old-space-size=1024"
 
