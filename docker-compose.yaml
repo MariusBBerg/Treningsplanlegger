@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     volumes:
-      - C:\postgres_container_data:/var/lib/postgresql/data
+      - ./postgres_container_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount the init.sql file
       - ../.env:/.env
 
