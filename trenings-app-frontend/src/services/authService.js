@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { API_URL } from '../utils/api_url';
 const register = (firstName, lastName, email, login, password) => {
+  console.log(API_URL + 'register') 
   return axios.post(API_URL + 'register', {
     firstName,
     lastName,

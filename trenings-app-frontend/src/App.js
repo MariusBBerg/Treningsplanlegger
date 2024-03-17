@@ -14,6 +14,7 @@ import ProfilePage from "./views/ProfilePage.js";
 import ClientList from "./views/ClientList.js";
 import ClientDashboard from "./views/ClientDashboard.js";
 
+
 function App() {
   return (
     <AuthProvider>

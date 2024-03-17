@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
-@PropertySource("file:../../../../.env")
+@PropertySource("file:C:/Users/mariu/Documents/Kode/Prosjekter/Treningsapp/.env")
 public class TreningsplanleggingApplication {
 
 	public static void main(String[] args) {
