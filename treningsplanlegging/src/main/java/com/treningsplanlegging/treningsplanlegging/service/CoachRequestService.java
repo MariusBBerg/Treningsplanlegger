@@ -30,6 +30,9 @@ public class CoachRequestService {
         if(requested.equals(requester)) {
             throw new IllegalStateException("You cannot send a request to yourself");
         }
+        if(requested.equals(requester.getCoach())) {
+            throw new IllegalStateException("You cannot send a request to your current coach");
+        }
         CoachRequest existingRequest = coachRequestRepository.findByRequesterAndRequestedAndStatus(requester, requested,
                 "Pending");
         if (existingRequest != null) {
