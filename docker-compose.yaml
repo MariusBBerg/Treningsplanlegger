@@ -13,6 +13,7 @@ services:
 
 
     restart: always
+
   backend:
     build: ./treningsplanlegging
     container_name: treningsapp_back
