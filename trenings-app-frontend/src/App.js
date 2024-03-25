@@ -13,6 +13,7 @@ import CoachRequestForm from "./views/CoachRequestForm";
 import ProfilePage from "./views/ProfilePage.js";
 import ClientList from "./views/ClientList.js";
 import ClientDashboard from "./views/ClientDashboard.js";
+import { Footer } from "flowbite-react";
 
 
 function App() {

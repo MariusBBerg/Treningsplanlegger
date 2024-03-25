@@ -12,6 +12,12 @@ import Navigation from '../components/Navigation/Navigation';
 import axios from "axios";
 import Footer from "../components/Footer";
 import { API_URL } from "../utils/api_url";
+
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+
+
+
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
   const userStr = localStorage.getItem("user");
@@ -20,11 +26,12 @@ export default function ProfilePage() {
   const [lastName, setLastName] = useState(user.lastName);
   const [email, setEmail] = useState(user.email);
   const [login, setLogin] = useState(user.login);
+  const [successMessage, setSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    // Her kan du legge til logikk for å oppdatere brukerdata
-    console.log("Form submitted");
     const userData = {
       firstName,
       lastName,
@@ -41,12 +48,13 @@ export default function ProfilePage() {
           },
         }
       );
-      //Oppdaterer med ny token
       if (response.data.token) {
         localStorage.setItem('user', JSON.stringify(response.data));
+        setSuccessMessage(true);
       }
     } catch (error) {
       console.error("Error updating user", error);
+      setErrorMessage("Error updating user");
     }
 
     setOpen(false);
@@ -149,6 +157,32 @@ export default function ProfilePage() {
           </form>
         </Box>
       </Modal>
+      <Snackbar
+        open={successMessage}
+        autoHideDuration={6000}
+        onClose={() => setSuccessMessage(false)}
+      >
+        <Alert
+          onClose={() => setSuccessMessage(false)}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Updated user succesfully
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={!!errorMessage}
+        autoHideDuration={6000}
+        onClose={() => setErrorMessage("")}
+      >
+        <Alert
+          onClose={() => setErrorMessage("")}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       <Footer />
     </div>
   );

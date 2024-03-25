@@ -17,22 +17,11 @@ const LoginForm = ({ onSwitchForm }) => {
   const { setLoggedIn } = useAuth();
   const location = useLocation();
   const [message, setMessage] = useState(location.state?.message);
-  const [messageShown, setMessageShown] = useState(false);
 
-  useEffect(() => {
-    if (message && !messageShown) {
-      setTimeout(() => {
-        setMessage("");
-        setMessageShown(true);
-        navigate(location.pathname, { state: { message: "" } });
-      }, 6000);
-    }
-  }, [message]);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleCloseSnackbarAndAlert = () => {
-    setMessage("");
-    setMessageShown(true); // Tilbakestiller flagget når snackbar lukkes manuelt
-  };
+
+
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -42,8 +31,8 @@ const LoginForm = ({ onSwitchForm }) => {
         setLoggedIn(true);
       },
       (error) => {
-        console.log(error);
-      }
+        setErrorMessage(error.response.data.message);
+      } 
     );
   };
 
@@ -52,7 +41,7 @@ const LoginForm = ({ onSwitchForm }) => {
   };
 
   return (
-    <div>
+    <div className="theme-bg min-h-screen flex flex-col justify-between">
       <Navigation />
       <Card variant="outlined" sx={{ maxWidth: 400, margin: "auto", marginTop: 20, padding: 3 }}>
         <Typography variant="h5" align="center" gutterBottom>
@@ -91,16 +80,16 @@ const LoginForm = ({ onSwitchForm }) => {
           </Button>
         </Typography>
         <Snackbar
-        open={!!message}
-        autoHideDuration={6000}
-        onClose={() => handleCloseSnackbarAndAlert}
+        open={!!errorMessage}
+        autoHideDuration={4000}
+        onClose={() => setErrorMessage("")}
       >
         <Alert
-          onClose={() => handleCloseSnackbarAndAlert}
-          severity="success"
+          onClose={() => setErrorMessage("")}
+          severity="error"
           sx={{ width: "100%" }}
         >
-          {message}
+          {errorMessage}
         </Alert>
       </Snackbar>
       </Card>

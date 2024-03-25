@@ -5,6 +5,7 @@ import { Button, TextField, Card, Typography, Grid } from "@mui/material";
 import Navigation from '../components/Navigation/Navigation';
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import Footer from "../components/Footer";
 
 const RegisterForm = () => {
   const [login, setLogin] = useState("");
@@ -23,7 +24,7 @@ const RegisterForm = () => {
         navigate("/login", { state: { message: "You have successfully registered" } });
       },
       (error) => {
-        setErrorMessage(error);
+        setErrorMessage(error.response.data.message);
         console.log(error);
       }
     );
@@ -116,6 +117,7 @@ const RegisterForm = () => {
         </Alert>
       </Snackbar>
       </Card>
+      <Footer />
     </div>
   );
 };

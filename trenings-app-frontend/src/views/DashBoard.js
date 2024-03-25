@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import { Link } from 'react-router-dom';
 import Navigation from '../components/Navigation/Navigation';
 import UserWorkoutForm from '../components/Workout/UserWorkoutForm';
 import Footer from '../components/Footer';
-import { useLocation } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
@@ -11,6 +10,8 @@ const DashBoard = () => {
   const location = useLocation();
   const [message,setMessage] = useState(location.state?.message);
   const [messageShown, setMessageShown] = useState(false);
+  const navigate = useNavigate();
+
 
 
 

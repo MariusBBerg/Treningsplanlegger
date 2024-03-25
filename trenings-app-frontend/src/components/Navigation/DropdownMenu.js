@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-export default function DropdownMenu({ items, name }) {
+export default function DropdownMenu({ items, name, className}) {
   const [isOpen, setIsOpen] = useState(false);
   const [navHeight, setNavHeight] = useState(0);
   const navRef = useRef(null);
@@ -16,7 +16,8 @@ export default function DropdownMenu({ items, name }) {
   return (
     <div className="dropdown relative flex items-center" ref={navRef}>
       <button
-        className="dropdown-toggle inline-flex items-center px-3 py-2 border border-transparent text-sm font-semibold leading-6 text-gray-900"
+        className={className}
+
         onClick={toggleDropdown}
       >
         {name}
