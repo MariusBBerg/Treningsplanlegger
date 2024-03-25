@@ -5,7 +5,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import Navigation from '../components/Navigation/Navigation';
 import Footer from "../components/Footer";
-
+import { API_URL } from "../utils/api_url";
 const ClientList = () => {
   const [clients, setClients] = useState([]);
   const userStr = localStorage.getItem("user");
@@ -14,7 +14,7 @@ const ClientList = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/workouts/clients`, {
+        const response = await axios.get(API_URL + `api/workouts/clients`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -29,7 +29,7 @@ const ClientList = () => {
 
   const handleDeleteClient = async (clientId) => {
     try {
-      await axios.delete(`http://localhost:8080/api/users/clients/${clientId}`, {
+      await axios.delete(API_URL + `api/users/clients/${clientId}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },

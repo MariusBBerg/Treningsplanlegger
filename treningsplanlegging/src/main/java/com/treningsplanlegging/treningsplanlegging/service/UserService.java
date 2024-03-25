@@ -43,6 +43,11 @@ public class UserService {
         if (optionalUser.isPresent()) {
             throw new AppException("Username already exists", HttpStatus.BAD_REQUEST);
         }
+        Optional<User> optionalEmail = userRepository.findByEmailIgnoreCase(userDto.getEmail());
+
+        if (optionalEmail.isPresent()) {
+            throw new AppException("Email already exists", HttpStatus.BAD_REQUEST);
+        }
 
         User user = userMapper.signUpToUser(userDto);
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
@@ -60,7 +65,7 @@ public class UserService {
 
     public UserDto login(CredentialsDto credentialsDto) {
         User user = userRepository.findByLoginIgnoreCase(credentialsDto.getLogin())
-        .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+        .orElseThrow(() -> new AppException("Unknown username", HttpStatus.NOT_FOUND));
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
             return userMapper.toUserDto(user);

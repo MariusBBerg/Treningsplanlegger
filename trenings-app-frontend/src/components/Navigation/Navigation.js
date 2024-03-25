@@ -9,13 +9,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import logo from "../assets/logo_nobg.png";
 import DropdownMenu from "./DropdownMenu";
 
-const menuItems = [
-  { name: "Requests", href: "/coach" },
-  { name: "All Clients", href: "/clients" },
-  { name: "Client Calendar", href: "/client-dashboard" },
-  
-  
-];
+
 
 const navigation = [
   { name: "Product", href: "#" },
@@ -29,6 +23,13 @@ const loggedInNavigation = [
   { name: "Profile", href: "/profile" },
   { name: "Coach", href: "/coach" },
 ];
+
+const menuItems = [
+  { name: "Requests", href: "/coach" },
+  { name: "All Clients", href: "/clients" },
+  { name: "Client Calendar", href: "/client-dashboard" },
+  
+];  
 
 export default function Navigation() {
   const [coachDropdownOpen, setCoachDropdownOpen] = useState(false);
@@ -80,7 +81,7 @@ export default function Navigation() {
           {navItems.map((item) => (
                     <React.Fragment key={item.name}>
                       {item.name === "Coach" ? (
-                        <DropdownMenu items={menuItems} name={"Coach"} />
+                        <DropdownMenu items={menuItems} name={"Coach"} className={"dropdown-toggle inline-flex items-center px-3 py-2 border border-transparent text-sm font-semibold leading-6 text-gray-900"} />
 
                       ) : (
                         <a
@@ -144,12 +145,8 @@ export default function Navigation() {
                   {navItems.map((item) => (
                     <React.Fragment key={item.name}>
                       {item.name === "Coach" ? (
-                            <Dropdown label="Dropdown" inline>
-                            <Dropdown.Item>Dashboard</Dropdown.Item>
-                            <Dropdown.Item>Settings</Dropdown.Item>
-                            <Dropdown.Item>Earnings</Dropdown.Item>
-                            <Dropdown.Item>Sign out</Dropdown.Item>
-                          </Dropdown>
+                        <DropdownMenu items={menuItems} name={"Coach"} classNamae={"dropdown-toggle inline-flex items-center -mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"} />
+
                       ) : (
                         <a
                           href={item.href}
@@ -163,12 +160,22 @@ export default function Navigation() {
                   ))}
                 </div>
                 <div className="py-6">
+                {!loggedIn && (
                   <a
-                    href="#"
+                    href="/login"
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                   >
                     Log in
                   </a>
+                )}
+                {loggedIn && (
+                  <a
+                    href="/logout"
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                  >
+                    Log Out
+                  </a>
+                )}
                 </div>
               </div>
             </div>

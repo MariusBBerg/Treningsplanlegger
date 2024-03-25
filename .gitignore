@@ -21,3 +21,5 @@
 /trenings-app-frontend/npm-debug.log*
 /trenings-app-frontend/yarn-debug.log*
 /trenings-app-frontend/yarn-error.log*
+.env
+postgres-container-data

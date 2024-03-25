@@ -1,11 +1,11 @@
 import axios from "axios";
-
+import { API_URL } from "../../../utils/api_url";
 const fetchWorkouts = async (client, user, setWorkouts) => {
   const clientParsed = client ? JSON.parse(client) : user;
 
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/workouts/user/${clientParsed.login}`,
+      API_URL + `api/workouts/user/${clientParsed.login}`,
       {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -32,7 +32,7 @@ const handleSubmitEdit = async (e, client, user, selectedWorkout, setOpenEditWor
 
   try {
     await axios.put(
-      `http://localhost:8080/api/workouts/${selectedWorkout.id}`, 
+      API_URL + `api/workouts/${selectedWorkout.id}`, 
       workoutData,
       {
         headers: {
@@ -64,7 +64,7 @@ const handleSubmit = async (e,client,user,setWorkouts,workoutData,setOpenAddWork
   const clientParsed = client ? JSON.parse(client) : user;
 
   try {
-    await axios.post("http://localhost:8080/api/workouts", workoutData, {
+    await axios.post(API_URL + "api/workouts", workoutData, {
       headers: {
         Authorization: `Bearer ${user.token}`, // Bruker token fra auth context
       },

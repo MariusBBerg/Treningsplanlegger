@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import { API_URL } from "../../utils/api_url.js";
 import moment from "moment";
 import "moment/locale/nb";
 import { Button, Modal, Label, Select } from "flowbite-react";
@@ -39,7 +39,7 @@ const ClientWorkoutForm = () => {
   const fetchClients = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/workouts/clients`,
+        API_URL + `api/workouts/clients`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,

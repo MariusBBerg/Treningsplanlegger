@@ -1,28 +1,38 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import authService from "../services/authService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Button, TextField, Card, Typography } from "@mui/material"; // Importerer Material-UI-komponenter
 import { useAuth } from '../contexts/AuthContext';
 import Navigation from '../components/Navigation/Navigation';
 import Footer from "../components/Footer";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+
 
 const LoginForm = ({ onSwitchForm }) => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { setLoggedIn } = useAuth();
+  const location = useLocation();
+  const [message, setMessage] = useState(location.state?.message);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+
+
 
   const handleLogin = (e) => {
     e.preventDefault();
     authService.login(login, password).then(
       () => {
-        navigate("/dashboard");
+        navigate("/dashboard", { state: { message: "You have successfully logged in!" } });
         setLoggedIn(true);
       },
       (error) => {
-        console.log(error);
-      }
+        setErrorMessage(error.response.data.message);
+      } 
     );
   };
 
@@ -31,7 +41,7 @@ const LoginForm = ({ onSwitchForm }) => {
   };
 
   return (
-    <div>
+    <div className="theme-bg min-h-screen flex flex-col justify-between">
       <Navigation />
       <Card variant="outlined" sx={{ maxWidth: 400, margin: "auto", marginTop: 20, padding: 3 }}>
         <Typography variant="h5" align="center" gutterBottom>
@@ -69,6 +79,19 @@ const LoginForm = ({ onSwitchForm }) => {
             Register
           </Button>
         </Typography>
+        <Snackbar
+        open={!!errorMessage}
+        autoHideDuration={4000}
+        onClose={() => setErrorMessage("")}
+      >
+        <Alert
+          onClose={() => setErrorMessage("")}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       </Card>
       <Footer />
     </div>

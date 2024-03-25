@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import authService from "../services/authService";
-import { Button, TextField, Card, Typography, Grid } from "@mui/material"; // Importerer Material-UI-komponenter
+import { Button, TextField, Card, Typography, Grid } from "@mui/material";
 import Navigation from '../components/Navigation/Navigation';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import Footer from "../components/Footer";
 
 const RegisterForm = () => {
   const [login, setLogin] = useState("");
@@ -10,15 +13,18 @@ const RegisterForm = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const navigate = useNavigate();
 
   const handleRegister = (e) => {
     e.preventDefault();
     authService.register(firstName, lastName, email, login, password).then(
       () => {
-        navigate("/login");
+        navigate("/login", { state: { message: "You have successfully registered" } });
       },
       (error) => {
+        setErrorMessage(error.response.data.message);
         console.log(error);
       }
     );
@@ -96,7 +102,22 @@ const RegisterForm = () => {
             Already have an account? <Link to="/login">Log in</Link>
           </Typography>
         </Grid>
+        
+      <Snackbar
+        open={!!errorMessage}
+        autoHideDuration={6000}
+        onClose={() => setErrorMessage("")}
+      >
+        <Alert
+          onClose={() => setErrorMessage("")}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       </Card>
+      <Footer />
     </div>
   );
 };
