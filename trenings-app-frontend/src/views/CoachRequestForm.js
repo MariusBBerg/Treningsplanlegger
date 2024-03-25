@@ -24,8 +24,15 @@ const CoachRequestForm = () => {
   const userStr = localStorage.getItem("user");
   const user = userStr ? JSON.parse(userStr) : null;
 
+
+
+  //Short polling for å hente requests hvert 5. sekund, sjekke om nye requests.
   useEffect(() => {
     fetchRequests();
+  
+    const intervalId = setInterval(fetchRequests, 5000);
+  
+    return () => clearInterval(intervalId);
   }, []);
 
   const searchUsers = async (searchTerm) => {
@@ -54,6 +61,8 @@ const CoachRequestForm = () => {
       setUsers([]);
     }
   }, [searchTerm]);
+
+
 
   const fetchRequests = async () => {
     try {
