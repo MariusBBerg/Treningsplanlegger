@@ -100,4 +100,9 @@ public class UserService {
         return userRepository.findByLoginContainingOrFirstNameContainingOrLastNameContaining(query, query, query);
     }
 
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                            .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+    }
+
 }
