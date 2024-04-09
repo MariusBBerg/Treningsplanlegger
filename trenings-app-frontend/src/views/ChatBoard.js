@@ -13,35 +13,10 @@ const ChatBoard = () => {
     const [chatId, setChatId] = useState(null);
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-
     const user = JSON.parse(localStorage.getItem("user"));
-
-    const connect = () => {
-        const socket = new SockJS(API_URL + "ws");
-        const temp = over(socket);
-        setStompClient(temp);
-        const headers = {
-            Authorization: `Bearer ${user.token}`
-        };
-
-        temp.connect(headers, onConnect, onError);
-    };
 
     const onError = (error) => {
         console.log("WebSocket Connection Error: ", error);
-    };
-
-    const onConnect = () => {
-        console.log("WebSocket Connected");
-        setIsConnected(true);
-
-        if (chatId) {
-            const subscription = stompClient.subscribe(`/group/${chatId}`, onMessageReceived);
-
-            return () => {
-                subscription.unsubscribe();
-            };
-        }
     };
 
     const onMessageReceived = (payload) => {
@@ -50,54 +25,69 @@ const ChatBoard = () => {
         setMessages(prevMessages => [...prevMessages, receivedMessage]);
     };
 
-    
-
     const sendMessage = async (messageContent) => {
         if (!stompClient || !stompClient.connected) {
             console.error("WebSocket connection is not established yet");
             return;
-        }
-    
+        }   
+
         const message = {
             chatId: chatId,
             content: messageContent,
-            userId: user.id, // Assuming you have a `username` field in the `user` object
+            userId: user.id,
         };
-    
+
         try {
-            // Send message to the server via HTTP to save it in the database
             await axios.post(`${API_URL}api/messages/create`, message, {
                 headers: {
                     Authorization: `Bearer ${user.token}`,
                 },
             });
-    
-            // Optionally, you can update local state with the sent message immediately
+
             setMessages(prevMessages => [...prevMessages, message]);
-    
-            // Send message to the server via WebSocket
             stompClient.send("/app/message", {}, JSON.stringify(message));
         } catch (error) {
             console.error("Error sending message", error);
         }
-    
+
         setNewMessage(""); // Clear input field after sending message
     };
+
     useEffect(() => {
-        const message = {
-            chatId: chatId,
-            content: newMessage,
-            userId: user.id, 
+        const connectWebSocket = () => {
+            const socket = new SockJS(API_URL + "ws");
+            const stompClient = over(socket);
+            const headers = { Authorization: `Bearer ${user.token}` };
+
+            stompClient.connect(headers, () => {
+                setIsConnected(true);
+                console.log("WebSocket Connected");
+                setStompClient(stompClient);
+            }, onError);
         };
 
-        if (newMessage && stompClient) {
-            setMessages(prevMessages => [...prevMessages, message]);
-            stompClient?.send("/app/message", {}, JSON.stringify(newMessage));
-        }
-    }, [newMessage]);
-    
-    
+        connectWebSocket();
 
+        return () => {
+            if (stompClient) {
+                stompClient.disconnect(() => {
+                    console.log("WebSocket Disconnected");
+                });
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isConnected && chatId && stompClient) {
+            console.log(`Subscribing to /group/${chatId}`);
+            const subscription = stompClient.subscribe(`/group/${chatId}`, onMessageReceived);
+
+            return () => {
+                console.log(`Unsubscribing from /group/${chatId}`);
+                subscription.unsubscribe();
+            };
+        }
+    }, [isConnected, chatId, stompClient]);
 
     const handleSendMessage = () => {
         sendMessage(newMessage);
@@ -148,26 +138,8 @@ const ChatBoard = () => {
         }
     };
 
-    useEffect(() => {
-        connect();
 
-        return () => {
-            if (stompClient) {
-                stompClient.disconnect();
-                console.log("WebSocket Disconnected");
-            }
-        };
-    }, []);
 
-    useEffect(() => {
-        if (isConnected && stompClient && stompClient.connected && chatId) {
-            const subscription = stompClient.subscribe(`/group/${chatId}`, onMessageReceived);
-
-            return () => {
-                subscription.unsubscribe();
-            };
-        }
-    }, [isConnected, stompClient, chatId]);
     
     
 
@@ -189,6 +161,7 @@ const ChatBoard = () => {
                 placeholder="Search users..."
             />
             <div className="user-list">
+                {/* Assuming users and handleUserClick are correctly implemented */}
                 {users.map((otherUser) => (
                     <div key={otherUser.id} onClick={() => handleUserClick(otherUser.id)}>
                         {otherUser.firstName}

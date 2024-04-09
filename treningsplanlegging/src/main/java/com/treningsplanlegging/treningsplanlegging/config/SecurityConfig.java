@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.POST, "/login", "/register").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/app/**", "/topic/**", "/queue/**", "/user/**").permitAll() //Sjekke denne etterhvert
                         .anyRequest().authenticated())
         ;
         return http.build();

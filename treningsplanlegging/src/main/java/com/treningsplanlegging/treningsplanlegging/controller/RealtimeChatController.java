@@ -12,11 +12,17 @@ public class RealtimeChatController {
     @Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
 
-	@MessageMapping("/message")
-	@SendTo("/group/public")
-	public Message receiveMessage(@Payload Message message) {
-		System.out.println("Received message: " + message);
-		simpMessagingTemplate.convertAndSend("/group/"+message.getChat().getId().toString(), message);
-		return message;
-	}
+	@Autowired
+    public RealtimeChatController(SimpMessagingTemplate simpMessagingTemplate) {
+        this.simpMessagingTemplate = simpMessagingTemplate;
+    }
+
+    @MessageMapping("/message")
+    public void receiveMessage(@Payload Message message) {
+        // Log the received message for debugging purposes
+        System.out.println("Received message: " + message.getContent() + " in chatId: " + message.getChat().getId());
+        
+        // Redirects the message to a specific chat group topic
+        simpMessagingTemplate.convertAndSend("/group/" + message.getChat().getId(), message);
+    }
 }
