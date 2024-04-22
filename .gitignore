@@ -24,4 +24,7 @@
 .env
 /trenings-app-frontend/Dockerfile
 /treningsplanlegging/Dockerfile
-postgres-container-data
+/treningsplanlegging/.env
+/trenings-app-frontend/.env
+
+postgres_container_data

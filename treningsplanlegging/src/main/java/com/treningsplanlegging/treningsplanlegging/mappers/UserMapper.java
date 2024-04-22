@@ -18,8 +18,5 @@ public interface UserMapper {
     @Mapping(target = "coach", ignore = true)
     @Mapping(target = "clients", ignore = true)
     UserDto toUserDto(User user);
-
-
-
     
 }

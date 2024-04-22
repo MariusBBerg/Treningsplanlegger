@@ -1,33 +1,35 @@
+version: '3.8'
 services:
   db:
+    image: postgres:latest
     ports:
       - 5432:5432
     container_name: treningsapp_db
-    image: postgres
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: treningsplanlegger
     volumes:
       - ./postgres_container_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount the init.sql file
-      - ../.env:/.env
 
 
     restart: always
+
   backend:
     build: ./treningsplanlegging
-    container_name: treningsapp_back
     ports:
-      - 8080:8080
+      - "8080:8080"
     depends_on:
       - db
-    volumes:
-      - ../.env:/.env
 
-    restart: always
+
   frontend:
     build: ./trenings-app-frontend
-    container_name: treningsapp_front
-    ports:
-      - 3000:3000
     depends_on:
       - backend
-    restart: always
+    ports:
+      - "3000:3000"
 
+
+volumes:
+  postgres-data:

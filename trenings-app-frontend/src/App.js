@@ -1,5 +1,5 @@
 // src/App.js
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from './views/HomePage';
 import LoginForm from "./views/LoginForm.js";
@@ -16,6 +16,10 @@ import ClientDashboard from "./views/ClientDashboard.js";
 
 
 function App() {
+  useEffect(() => {
+    document.title = "Treningsplanleggeren";
+  }, []);
+  
   return (
     <AuthProvider>
       <BrowserRouter>
