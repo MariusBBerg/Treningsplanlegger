@@ -22,4 +22,6 @@
 /trenings-app-frontend/yarn-debug.log*
 /trenings-app-frontend/yarn-error.log*
 .env
+/trenings-app-frontend/Dockerfile
+/treningsplanlegging/Dockerfile
 postgres-container-data
