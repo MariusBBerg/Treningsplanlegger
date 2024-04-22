@@ -4,8 +4,6 @@ services:
       - 5432:5432
     container_name: treningsapp_db
     image: postgres
-    env_file:
-      - .env
     volumes:
       - ./postgres_container_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount the init.sql file
@@ -18,8 +16,6 @@ services:
     container_name: treningsapp_back
     ports:
       - 8080:8080
-    env_file:
-      - .env
     depends_on:
       - db
     volumes:
