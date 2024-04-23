@@ -33,13 +33,13 @@ const loggedInNavigation = [
 export default function Navigation() {
   const [coachDropdownOpen, setCoachDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { loggedIn } = useAuth(); // Anta at dette er en hook som returnerer autentiseringsstatus
+  const { loggedIn } = useAuth(); 
   const [hasScrolled, setHasScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
-      setHasScrolled(offset > 30); // Sett til true hvis brukeren har scrollet mer enn 50px
+      setHasScrolled(offset > 30); 
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -144,16 +144,11 @@ export default function Navigation() {
                   {navItems.map((item) => (
                     <React.Fragment key={item.name}>
                       {item.name === "Coach" ? (
-                            <Dropdown label="Dropdown" inline>
-                            <Dropdown.Item>Dashboard</Dropdown.Item>
-                            <Dropdown.Item>Settings</Dropdown.Item>
-                            <Dropdown.Item>Earnings</Dropdown.Item>
-                            <Dropdown.Item>Sign out</Dropdown.Item>
-                          </Dropdown>
+                            <DropdownMenu items={menuItems} name={"Coach"} />
                       ) : (
                         <a
                           href={item.href}
-                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                          className="block rounded-lg px-3 py-2 text-base font-semibold leading-6 text-gray-900 hover:bg-gray-50"
                         >
                           {item.name}
                         </a>
@@ -163,12 +158,22 @@ export default function Navigation() {
                   ))}
                 </div>
                 <div className="py-6">
+                {!loggedIn && (
                   <a
-                    href="#"
+                    href="/login"
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                   >
                     Log in
                   </a>
+                )}
+                {loggedIn && (
+                  <a
+                    href="/logout"
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                  >
+                    Log Out
+                  </a>
+                )}
                 </div>
               </div>
             </div>
