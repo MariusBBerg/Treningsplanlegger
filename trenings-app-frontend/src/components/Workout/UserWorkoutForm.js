@@ -474,7 +474,7 @@ const UserWorkoutForm = () => {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenAddWorkoutModal(false)}>
+          <Button color="gray" onClick={() => setOpenEditWorkoutModal(false)}>
             Close
           </Button>
         </Modal.Footer>
