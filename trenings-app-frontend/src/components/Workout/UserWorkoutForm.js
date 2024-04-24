@@ -48,6 +48,35 @@ const UserWorkoutForm = () => {
     return moment(date).format("YYYY-MM-DD HH:mm");
   };
 
+  useEffect(() => {
+    if (openAddWorkoutModal) {
+      // Reset standardverdiene når modalen for å legge til ny trening åpnes
+      setDate(""); // Standardverdien for dato
+      setTime("12:00"); // Standardverdien for tid
+      setName("");
+      setDescription("");
+      setType("");
+      setDistance("");
+      setDuration("");
+      setZone("");
+    }
+  }, [openAddWorkoutModal]);
+  
+  useEffect(() => {
+    if (openEditWorkoutModal && selectedWorkout) {
+      // Sett feltene basert på verdiene i valgt treningsøkt
+      setDate(moment(selectedWorkout.date).format("YYYY-MM-DD"));
+      setTime(moment(selectedWorkout.date).format("HH:mm"));
+      setName(selectedWorkout.name || "");
+      setDescription(selectedWorkout.description || "");
+      setType(selectedWorkout.type || "");
+      setDistance(selectedWorkout.distance || "");
+      setDuration(selectedWorkout.duration || "");
+      setZone(selectedWorkout.intensityZone || "");
+    }
+  }, [selectedWorkout, openEditWorkoutModal]);
+  
+
   return (
     <div>
       <label htmlFor="date">Dato:</label>
@@ -474,7 +503,7 @@ const UserWorkoutForm = () => {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenAddWorkoutModal(false)}>
+          <Button color="gray" onClick={() => setOpenEditWorkoutModal(false)}>
             Close
           </Button>
         </Modal.Footer>

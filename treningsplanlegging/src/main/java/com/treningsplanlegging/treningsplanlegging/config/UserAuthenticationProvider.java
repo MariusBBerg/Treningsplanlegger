@@ -34,9 +34,10 @@ public class UserAuthenticationProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String login) {
+
+    public String createToken(String login, long durationMillis) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + 3600000); // 1 hour
+        Date validity = new Date(now.getTime() + durationMillis);
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         return JWT.create()
@@ -46,6 +47,17 @@ public class UserAuthenticationProvider {
                 .sign(algorithm);
     }
 
+    public String createAccessToken(String login) {
+        // 30 minutter gyldighet
+        return createToken(login, 1800000); // 30 minutter
+    }
+
+    public String createRefreshToken(String login) {
+        // 7 dager gyldighet
+        return createToken(login, 604800000); // 7 dager
+    }
+
+
     public Authentication validateToken(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
@@ -54,9 +66,15 @@ public class UserAuthenticationProvider {
 
         DecodedJWT decoded = verifier.verify(token);
 
-        String login = decoded.getSubject(); // This should be the login
+        String login = decoded.getSubject(); //Subject er login/brukernavn
 
         return new UsernamePasswordAuthenticationToken(login, null, Collections.emptyList());
     }
 
+    public boolean isTokenExpired(String token) {
+        DecodedJWT decoded = JWT.decode(token);
+        Date now = new Date();
+        return now.after(decoded.getExpiresAt());
+    }
+    
 }

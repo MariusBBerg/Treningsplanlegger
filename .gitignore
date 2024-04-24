@@ -26,5 +26,8 @@
 /treningsplanlegging/Dockerfile
 /treningsplanlegging/.env
 /trenings-app-frontend/.env
+/treningsplanlegging/src/main/resources/applicationdev.properties
+/treningsplanlegging/src/main/resources/applicationprod.properties
+/treningsplanlegging/src/main/resources/application.properties
 
-postgres_container_data
+/postgres_container_data

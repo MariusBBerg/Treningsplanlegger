@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -13,8 +13,14 @@ import CardActions from "@mui/material/CardActions";
 import { API_URL } from "../utils/api_url";
 import Navigation from "../components/Navigation/Navigation"; // Sørg for at denne linjen er korrekt importert
 import Footer from "../components/Footer";
+import { usePageVisibility } from "./Hooks/usePageVisibility"; 
 
 const CoachRequestForm = () => {
+  const isPageVisible = usePageVisibility(); //om bruker er inne på siden eller ikke
+  const timerIdRef = useRef(null);
+  const [isPollingEnabled, setIsPollingEnabled] = useState(true);
+
+
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState([]);
   const [requests, setRequests] = useState([]);
@@ -66,7 +72,6 @@ const CoachRequestForm = () => {
         }
       );
       setRequests(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error("Error fetching requests", error);
     }
@@ -107,6 +112,42 @@ const CoachRequestForm = () => {
       console.error("Error responding to request", error);
     }
   };
+
+
+
+  //Short-polling, sjekker om bruker har fanen aktiv eller ikke, hvis aktiv: polling hvert 30 sekund
+  useEffect(() => {
+    const pollingCallback = () => {
+      try {
+        fetchRequests();
+      } catch (error) {
+
+      if (error) {
+        setIsPollingEnabled(false);
+        console.log('Polling failed. Stopped polling.');
+      }
+    };
+    };
+
+    const startPolling = () => {
+
+      timerIdRef.current = setInterval(pollingCallback, 30000);
+    };
+
+    const stopPolling = () => {
+      clearInterval(timerIdRef.current);
+    };
+
+    if (isPageVisible && isPollingEnabled) {
+      startPolling();
+    } else {
+      stopPolling();
+    }
+
+    return () => {
+      stopPolling();
+    };
+  }, [isPageVisible, isPollingEnabled]);
 
   return (
     <div className="theme-bg min-h-screen flex flex-col justify-between"> {/* For å få footer til å bli nederst */}

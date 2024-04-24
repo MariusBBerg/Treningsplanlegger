@@ -92,7 +92,7 @@ public class UserService {
     }
 
     public List<User> searchUsers(String query) {
-        return userRepository.findByLoginContainingOrFirstNameContainingOrLastNameContaining(query, query, query);
+        return userRepository.findByLoginContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(query, query, query);
     }
 
 }

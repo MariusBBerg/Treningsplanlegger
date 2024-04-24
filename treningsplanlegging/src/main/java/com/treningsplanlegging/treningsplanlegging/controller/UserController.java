@@ -52,6 +52,7 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    
     @PutMapping("/me")
     public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto updatedUserDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -79,7 +80,8 @@ public class UserController {
 
         
         UserDto updatedUser = userMapper.toUserDto(currentUser);
-        updatedUser.setToken(userAuthenticationProvider.createToken(updatedUser.getLogin()));
+        updatedUser.setToken(userAuthenticationProvider.createAccessToken(updatedUser.getLogin()));
+        updatedUser.setRefreshToken(userAuthenticationProvider.createRefreshToken(updatedUser.getLogin()));
         //Returnerer objektet med den nye tokenen
         return ResponseEntity.ok(updatedUser);
     }
