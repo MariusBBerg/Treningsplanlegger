@@ -2,8 +2,8 @@
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from './views/HomePage';
-import LoginForm from "./views/LoginForm.js";
-import RegisterForm from "./views/RegisterForm.js";
+import LoginForm from "./views/Authentication/LoginForm.js";
+import RegisterForm from "./views/Authentication/RegisterForm.js";
 import DashBoard from "./views/DashBoard.js";
 import ProtectedRoute from "./auth/ProtectedRoute.js";
 import PublicRoute from "./auth/PublicRoute.js";

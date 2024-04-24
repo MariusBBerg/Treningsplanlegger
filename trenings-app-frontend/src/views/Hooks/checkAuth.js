@@ -6,7 +6,6 @@ const isTokenExpired = (token) => {
   if (!token) return true;
   const payload = parseJwt(token);
   const currentTime = Math.floor(Date.now() / 1000);
-  console.log(currentTime, payload.exp)
   return currentTime > payload.exp;
 };
 
