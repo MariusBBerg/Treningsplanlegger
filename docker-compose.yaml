@@ -23,13 +23,6 @@ services:
       - db
 
 
-  frontend:
-    build: ./trenings-app-frontend
-    depends_on:
-      - backend
-    ports:
-      - "3000:3000"
-
 
 volumes:
   postgres-data:

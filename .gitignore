@@ -27,4 +27,4 @@
 /treningsplanlegging/.env
 /trenings-app-frontend/.env
 
-postgres_container_data
+/postgres_container_data
