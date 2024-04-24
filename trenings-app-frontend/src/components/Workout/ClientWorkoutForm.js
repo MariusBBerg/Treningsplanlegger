@@ -64,6 +64,20 @@ const ClientWorkoutForm = () => {
     return moment(date).format("YYYY-MM-DD HH:mm");
   };
 
+  useEffect(() => {
+    if (openEditWorkoutModal && selectedWorkout) {
+      // Sett feltene basert på verdiene i valgt treningsøkt
+      setDate(moment(selectedWorkout.date).format("YYYY-MM-DD"));
+      setTime(moment(selectedWorkout.date).format("HH:mm"));
+      setName(selectedWorkout.name || "");
+      setDescription(selectedWorkout.description || "");
+      setType(selectedWorkout.type || "");
+      setDistance(selectedWorkout.distance || "");
+      setDuration(selectedWorkout.duration || "");
+      setZone(selectedWorkout.intensityZone || "");
+    }
+  }, [selectedWorkout, openEditWorkoutModal]);
+
   return (
     <div>
       <div className="flex justify-center">
