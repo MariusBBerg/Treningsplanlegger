@@ -16,7 +16,7 @@ const DashBoard = () => {
         <div className="mt-6 w-full max-w-4xl">
           <UserWorkoutForm />
         </div>
-        <Link to="/logout" className="text-red-600 hover:text-red-800 mt-4 transition duration-300 ease-in-out">Logg Ut</Link>
+        <Link to="/logout" className="text-red-600 hover:text-red-800 mt-4 transition duration-300 ease-in-out">Log out</Link>
       </div>
     <Footer />  
     </div>

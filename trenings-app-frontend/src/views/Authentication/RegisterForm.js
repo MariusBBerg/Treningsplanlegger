@@ -37,7 +37,7 @@ const RegisterForm = () => {
         <form onSubmit={handleRegister} className="space-y-6">
           <TextField
             id="login"
-            label="Login"
+            label="Username"
             variant="outlined"
             fullWidth
             required

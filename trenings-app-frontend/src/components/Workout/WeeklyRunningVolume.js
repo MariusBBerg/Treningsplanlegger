@@ -48,7 +48,7 @@ const WeeklyRunningVolume = ({ client, week,workouts }) => {
     <Card sx={{ minWidth: 275, margin: 2 }}>
       <CardContent>
         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          Ukentlig løpevolum
+          Weekly Running Volume
         </Typography>
         <Typography variant="h5" component="div">
           {weeklyVolume.toFixed(2)} km
