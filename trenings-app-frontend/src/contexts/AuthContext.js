@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { isAuthenticated } from '../utils/auth'; // Anta at denne funksjonen sjekker for en bruker-token i localStorage
+import { isAuthenticated } from '../utils/auth'; 
 
 const AuthContext = createContext();
 
