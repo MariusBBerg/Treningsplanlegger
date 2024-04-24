@@ -83,14 +83,14 @@ const ClientWorkoutForm = () => {
       <div className="flex justify-center">
         <div className="max-w-md py-2">
           <div className="mb-2">
-            <Label htmlFor="client">Klient:</Label>
+            <Label htmlFor="client">Client:</Label>
           </div>
           <Select
             id="client"
             value={client}
             onChange={(e) => setClient(e.target.value)}
           >
-            <option value="">Velg en klient</option>
+            <option value="">Choose a client</option>
             {clients.map((client) => (
               <option key={client.id} value={JSON.stringify(client)}>
                 {client.firstName} {client.lastName}
@@ -160,10 +160,10 @@ const ClientWorkoutForm = () => {
                   value={type}
                   onChange={(e) => setType(e.target.value)}
                 >
-                  <option value="">Velg en type</option>
-                  <option value="Løping">Løping</option>
-                  <option value="Styrke">Styrke</option>
-                  <option value="Cardio">Cardio</option>
+                  <option value="">Choose a type</option>
+                  <option value="Løping">Running</option>
+                  <option value="Styrke">Strength</option>
+                  <option value="Cardio">General Cardio</option>
                 </Select>
                 <div className="max-w-sm py-2">
                     <label
@@ -190,7 +190,7 @@ const ClientWorkoutForm = () => {
                       htmlFor="distance"
                       className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
-                      Distanse (km):
+                      Distance (km):
                     </label>
                     <input
                       type="number"
@@ -205,7 +205,7 @@ const ClientWorkoutForm = () => {
                       htmlFor="duration"
                       className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
-                      Varighet (minutter):
+                      Duration (minutes):
                     </label>
                     <input
                       type="number"
@@ -243,7 +243,7 @@ const ClientWorkoutForm = () => {
                   htmlFor="description"
                   className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                 >
-                  Beskrivelse:
+                  Description:
                 </label>
                 <textarea
                   id="description"
@@ -258,7 +258,7 @@ const ClientWorkoutForm = () => {
                   htmlFor="date"
                   className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                 >
-                  Dato:
+                  Date:
                 </label>
                 <input
                   type="date"
@@ -274,7 +274,7 @@ const ClientWorkoutForm = () => {
                   htmlFor="time"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Tid:
+                  Time:
                 </label>
                 <input
                   type="time"
@@ -301,16 +301,14 @@ const ClientWorkoutForm = () => {
         onClose={() => setOpenViewWorkoutModal(false)}
       >
         <Modal.Body>
-          {selectedWorkout &&
-            (console.log(selectedWorkout),
-            (
+          {selectedWorkout && (
               <div className="space-y-6">
                 <div className="max-w-md py-2">
                   <h2 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
                     {selectedWorkout.name}
                   </h2>
                   <p className="text-sm text-gray-900 dark:text-white">
-                    Dato: {formatDate(selectedWorkout.start)}
+                    Date: {formatDate(selectedWorkout.start)}
                   </p>
                   <p className="text-sm text-gray-900 dark:text-white">
                     Type: {selectedWorkout.type}
@@ -318,22 +316,22 @@ const ClientWorkoutForm = () => {
                   {selectedWorkout.type === "Løping" && (
                     <>
                       <p className="text-sm text-gray-900 dark:text-white">
-                        Varighet: {selectedWorkout.duration} minutter
+                        Duration: {selectedWorkout.duration} minutes
                       </p>
                       <p className="text-sm text-gray-900 dark:text-white">
-                        Distanse: {selectedWorkout.distance} km
+                        Distance: {selectedWorkout.distance} km
                       </p>
                       <p className="text-sm text-gray-900 dark:text-white">
-                        Intensitet: Sone {selectedWorkout.intensity}
+                        Intensity: Zone {selectedWorkout.intensity}
                       </p>
                     </>
                   )}
                   <p className="text-sm text-gray-900 dark:text-white">
-                    Notater: {selectedWorkout.description}
+                    Description: {selectedWorkout.description}
                   </p>
                 </div>
               </div>
-            ))}
+            )}
         </Modal.Body>
         <Modal.Footer>
           <Button color="gray" onClick={() => setOpenViewWorkoutModal(false)}>
@@ -397,10 +395,10 @@ const ClientWorkoutForm = () => {
                   <Label htmlFor="type">Type:</Label>
                 </div>
                 <Select id="type" onChange={(e) => setType(e.target.value)}>
-                  <option value="">Velg en type</option>
-                  <option value="Løping">Løping</option>
-                  <option value="Styrke">Styrke</option>
-                  <option value="Cardio">Cardio</option>
+                  <option value="">Choose a type</option>
+                  <option value="Løping">Running</option>
+                  <option value="Styrke">Strength</option>
+                  <option value="Cardio">General Cardio</option>
                 </Select>
                 <div className="max-w-sm py-2">
                     <label
@@ -427,7 +425,7 @@ const ClientWorkoutForm = () => {
                       htmlFor="distance"
                       className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
-                      Distanse (km):
+                      Distance (km):
                     </label>
                     <input
                       type="number"
@@ -442,7 +440,7 @@ const ClientWorkoutForm = () => {
                       htmlFor="duration"
                       className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
-                      Varighet (minutter):
+                      Duration (minutes):
                     </label>
                     <input
                       type="number"
@@ -479,7 +477,7 @@ const ClientWorkoutForm = () => {
                   htmlFor="description"
                   className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                 >
-                  Beskrivelse:
+                  Description:
                 </label>
                 <textarea
                   id="description"
@@ -493,7 +491,7 @@ const ClientWorkoutForm = () => {
                   htmlFor="date"
                   className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                 >
-                  Dato:
+                  Date:
                 </label>
                 <input
                   type="date"
@@ -508,7 +506,7 @@ const ClientWorkoutForm = () => {
                   htmlFor="time"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Tid:
+                  Time:
                 </label>
                 <input
                   type="time"

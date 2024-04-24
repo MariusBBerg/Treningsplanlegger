@@ -51,7 +51,6 @@ const UserWorkoutForm = () => {
   useEffect(() => {
     if (openAddWorkoutModal) {
       // Reset standardverdiene når modalen for å legge til ny trening åpnes
-      setDate(""); // Standardverdien for dato
       setTime("12:00"); // Standardverdien for tid
       setName("");
       setDescription("");
@@ -79,7 +78,7 @@ const UserWorkoutForm = () => {
 
   return (
     <div>
-      <label htmlFor="date">Dato:</label>
+      <label htmlFor="date">Date:</label>
       <FullCalendarComponent
         workouts={workouts}
         setDate={setDate}
@@ -142,10 +141,10 @@ const UserWorkoutForm = () => {
                   required 
                   onChange={(e) => setType(e.target.value)}
                 >
-                  <option value="">Velg en type</option>
-                  <option value="Løping">Løping</option>
-                  <option value="Styrke">Styrke</option>
-                  <option value="Cardio">Cardio</option>
+                  <option value="">Choose a type</option>
+                  <option value="Løping">Running</option>
+                  <option value="Styrke">Strength</option>
+                  <option value="Cardio">General Cardio</option>
                 </Select>
                 <div className="max-w-sm py-2">
                     <label
@@ -172,7 +171,7 @@ const UserWorkoutForm = () => {
                       htmlFor="distance"
                       className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
-                      Distanse (km):
+                      Distance (km):
                     </label>
                     <input
                       type="number"
@@ -187,7 +186,7 @@ const UserWorkoutForm = () => {
                       htmlFor="duration"
                       className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
-                      Varighet (minutter):
+                      Duration (minutes):
                     </label>
                     <input
                       type="number"
@@ -224,7 +223,7 @@ const UserWorkoutForm = () => {
                   htmlFor="description"
                   className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                 >
-                  Beskrivelse:
+                  Description:
                 </label>
                 <textarea
                   id="description"
@@ -238,7 +237,7 @@ const UserWorkoutForm = () => {
                   htmlFor="date"
                   className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                 >
-                  Dato:
+                  Date:
                 </label>
                 <input
                   type="date"
@@ -253,7 +252,7 @@ const UserWorkoutForm = () => {
                   htmlFor="time"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Tid:
+                  Time:
                 </label>
                 <input
                   type="time"
@@ -294,18 +293,18 @@ const UserWorkoutForm = () => {
                 {selectedWorkout.type === "Løping" && (
                   <>
                     <p className="text-sm text-gray-900 dark:text-white">
-                      Varighet: {selectedWorkout.duration} minutter
+                      Duration: {selectedWorkout.duration} minutes
                     </p>
                     <p className="text-sm text-gray-900 dark:text-white">
-                      Distanse: {selectedWorkout.distance} km
+                      Distance: {selectedWorkout.distance} km
                     </p>
                     <p className="text-sm text-gray-900 dark:text-white">
-                      Intensitet: Sone {selectedWorkout.intensityZone}
+                      Intensity: Zone {selectedWorkout.intensityZone}
                     </p>
                   </>
                 )}
                 <p className="text-sm text-gray-900 dark:text-white">
-                  Notater: {selectedWorkout.description}
+                  Description: {selectedWorkout.description}
                 </p>
               </div>
             </div>
@@ -377,10 +376,10 @@ const UserWorkoutForm = () => {
                   defaultValue={selectedWorkout.type}
                   onChange={(e) => setType(e.target.value)}
                 >
-                  <option value="">Velg en type</option>
-                  <option value="Løping">Løping</option>
-                  <option value="Styrke">Styrke</option>
-                  <option value="Cardio">Cardio</option>
+                  <option value="">Choose a type</option>
+                  <option value="Løping">Running</option>
+                  <option value="Styrke">Strength</option>
+                  <option value="Cardio">General Cardio</option>
                 </Select>
                 <div className="max-w-sm py-2">
                     <label
@@ -407,7 +406,7 @@ const UserWorkoutForm = () => {
                       htmlFor="distance"
                       className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
-                      Distanse (km):
+                      Distance (km):
                     </label>
                     <input
                       type="number"
@@ -422,7 +421,7 @@ const UserWorkoutForm = () => {
                       htmlFor="duration"
                       className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                     >
-                      Varighet (minutter):
+                      Duration (minutes):
                     </label>
                     <input
                       type="number"
@@ -459,7 +458,7 @@ const UserWorkoutForm = () => {
                   htmlFor="description"
                   className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                 >
-                  Beskrivelse:
+                  Description:
                 </label>
                 <textarea
                   id="description"
@@ -473,7 +472,7 @@ const UserWorkoutForm = () => {
                   htmlFor="date"
                   className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
                 >
-                  Dato:
+                  Date:
                 </label>
                 <input
                   type="date"
@@ -488,7 +487,7 @@ const UserWorkoutForm = () => {
                   htmlFor="time"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Tid:
+                  Time:
                 </label>
                 <input
                   type="time"

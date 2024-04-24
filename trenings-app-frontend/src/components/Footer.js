@@ -10,7 +10,7 @@ const Footer = () => {
         <p>
           Made By -
           <a className="font-semibold" href="https://github.com/MariusBBerg"
-            >Marius Bakken Berg</a
+            > Marius Bakken Berg</a
           >
         </p>
       </div>
