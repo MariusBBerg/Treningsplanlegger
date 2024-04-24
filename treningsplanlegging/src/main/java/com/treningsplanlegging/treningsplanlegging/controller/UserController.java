@@ -52,6 +52,7 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    
     @PutMapping("/me")
     public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto updatedUserDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

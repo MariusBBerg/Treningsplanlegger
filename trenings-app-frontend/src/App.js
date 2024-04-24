@@ -7,18 +7,24 @@ import RegisterForm from "./views/RegisterForm.js";
 import DashBoard from "./views/DashBoard.js";
 import ProtectedRoute from "./auth/ProtectedRoute.js";
 import PublicRoute from "./auth/PublicRoute.js";
-import Logout from "./components/LogOut.js"; // 
+import Logout from "./components/LogOut.js";  
 import { AuthProvider } from "./contexts/AuthContext";
 import CoachRequestForm from "./views/CoachRequestForm";
 import ProfilePage from "./views/ProfilePage.js";
 import ClientList from "./views/ClientList.js";
 import ClientDashboard from "./views/ClientDashboard.js";
+import checkAuth from "./views/Hooks/checkAuth.js";
 
 
 function App() {
   useEffect(() => {
     document.title = "Treningsplanleggeren";
+    
+
+    checkAuth(); // Sjekk tokenet ved første lasting
   }, []);
+
+ 
   
   return (
     <AuthProvider>

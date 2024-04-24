@@ -48,17 +48,16 @@ public class AuthController {
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
     }
 
-    @GetMapping("/validate-token")
+    @GetMapping("/validateToken")
     public ResponseEntity<?> validateToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        } else {
-            return ResponseEntity.ok("Token is valid");
-        }
+        };
+        return ResponseEntity.ok("Token is valid");
+        
     }
-
 
 
 }
