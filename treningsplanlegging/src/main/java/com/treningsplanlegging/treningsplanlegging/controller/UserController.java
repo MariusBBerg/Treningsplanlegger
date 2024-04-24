@@ -80,7 +80,8 @@ public class UserController {
 
         
         UserDto updatedUser = userMapper.toUserDto(currentUser);
-        updatedUser.setToken(userAuthenticationProvider.createToken(updatedUser.getLogin()));
+        updatedUser.setToken(userAuthenticationProvider.createAccessToken(updatedUser.getLogin()));
+        updatedUser.setRefreshToken(userAuthenticationProvider.createRefreshToken(updatedUser.getLogin()));
         //Returnerer objektet med den nye tokenen
         return ResponseEntity.ok(updatedUser);
     }
