@@ -51,7 +51,6 @@ const UserWorkoutForm = () => {
   useEffect(() => {
     if (openAddWorkoutModal) {
       // Reset standardverdiene når modalen for å legge til ny trening åpnes
-      setDate(""); // Standardverdien for dato
       setTime("12:00"); // Standardverdien for tid
       setName("");
       setDescription("");

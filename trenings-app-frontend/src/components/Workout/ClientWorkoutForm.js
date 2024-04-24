@@ -301,9 +301,7 @@ const ClientWorkoutForm = () => {
         onClose={() => setOpenViewWorkoutModal(false)}
       >
         <Modal.Body>
-          {selectedWorkout &&
-            (console.log(selectedWorkout),
-            (
+          {selectedWorkout && (
               <div className="space-y-6">
                 <div className="max-w-md py-2">
                   <h2 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
@@ -333,7 +331,7 @@ const ClientWorkoutForm = () => {
                   </p>
                 </div>
               </div>
-            ))}
+            )}
         </Modal.Body>
         <Modal.Footer>
           <Button color="gray" onClick={() => setOpenViewWorkoutModal(false)}>

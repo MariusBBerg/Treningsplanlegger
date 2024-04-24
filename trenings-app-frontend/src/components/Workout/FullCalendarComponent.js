@@ -77,7 +77,6 @@ useEffect(() => {
   };
 
   const handleDateClick = (info) => {
-    console.log('Clicked on date:', info.dateStr);
     const start = moment(info.date).format("YYYY-MM-DD");
     const defaultTime = "12:00";
     setDate(start);
@@ -91,7 +90,6 @@ useEffect(() => {
     setOpenViewWorkoutModal(true);
   };
   const handleDatesSet = (info) => {
-    console.log(currentView);
     if (currentView !== "timeGridWeek") {
       setCurrentWeek(moment().isoWeek());
     } else {
