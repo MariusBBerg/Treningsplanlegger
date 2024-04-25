@@ -80,7 +80,7 @@ const handleSubmit = async (e,client,user,setWorkouts,workoutData,setOpenAddWork
 };
 
 
-const exportToGoogleCalendar = async (workout,user) => {
+const exportToGoogleCalendar = async (workout,user,setOpenAddWorkoutModal,setExportingWorkout,setWorkoutExported,setWorkoutNotExported) => {
 
   if (!user || !user.token) {
     console.error("Bruker er ikke autentisert.");
@@ -88,6 +88,7 @@ const exportToGoogleCalendar = async (workout,user) => {
     return;
   }
 
+  setExportingWorkout(true);
   try {
     const response = await axios.post(API_URL + 'api/google-calendar/export-event', workout, {
       headers: {
@@ -95,15 +96,20 @@ const exportToGoogleCalendar = async (workout,user) => {
       },});
 
     if (response.status === 200) {
-      alert('Successfully exported to Google Calendar!'); // Gi brukeren tilbakemelding
+      setWorkoutExported(true);
     } else {
-      alert('Failed to export to Google Calendar.'); // Feil
+      setWorkoutNotExported(true);
     }
   } catch (error) {
     console.error('Error exporting to Google Calendar:', error);
-    alert('Error exporting to Google Calendar.');
+    setWorkoutNotExported(true);
+  }
+  finally {
+    setExportingWorkout(false);
   }
 };
+
+
 
 export { fetchWorkouts, handleSubmitEdit, handleSubmit,exportToGoogleCalendar };
 

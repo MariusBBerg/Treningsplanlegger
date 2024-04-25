@@ -16,18 +16,24 @@ const GoogleAuthButton = () => {
         '&client_id=' + clientId + // Bygg riktig URL
         '&redirect_uri=' + redirectUri +
         '&response_type=code' +
-        '&scope=https://www.googleapis.com/auth/calendar.events';
+        '&scope=' + encodeURIComponent(
+          'https://www.googleapis.com/auth/calendar.events ' +
+          'https://www.googleapis.com/auth/calendar.calendarlist.readonly ' +
+          'https://www.googleapis.com/auth/calendar.app.created'
+        );
       
         window.location.href = googleAuthUrl; // Omdiriger til Google OAuth
       };
       
 
   return (
+    
     <Button
       color="blue"
       onClick={authorizeGoogleOAuth} // Kall funksjonen for å starte autentisering
+      className="mt-5"
     >
-      Authorize Google Calendar
+      Authorize With Google Calendar
     </Button>
   );
 };

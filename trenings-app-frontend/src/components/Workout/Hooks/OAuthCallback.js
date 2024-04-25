@@ -15,7 +15,7 @@ const handleOAuthCallback = async () => {
   }
     try {
       // Send autorisasjonskoden til backend for utveksling mot tokens
-      await axios.post(
+      const response = await axios.post(
         API_URL + `api/google-calendar/oauth2callback`,encodedCode, 
         {
           headers: {
@@ -24,6 +24,11 @@ const handleOAuthCallback = async () => {
 
         }
       );
+      if (response.status === 200) {
+        user.isGoogleAuthenticated=true;
+        localStorage.setItem("user", JSON.stringify(user));
+
+      }
 
 
     } catch (error) {
