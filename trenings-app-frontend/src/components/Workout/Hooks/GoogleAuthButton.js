@@ -7,7 +7,7 @@ import { API_URL } from '../../../utils/api_url';
 const userStr = localStorage.getItem("user");
 const user = userStr ? JSON.parse(userStr) : null;
 const clientId = '589841951698-k4dn8c07qbhmhqp50vhb428gpa36iup1.apps.googleusercontent.com';
-const redirectUri = 'https://mariusberg.xyz/googlecalendar/callback';
+const redirectUri = 'https://www.mariusberg.xyz/googlecalendar/callback';
 
 const GoogleAuthButton = () => {
     const authorizeGoogleOAuth = () => {
