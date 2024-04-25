@@ -31,6 +31,7 @@ public class AuthController {
         String accessToken = userAuthenticationProvider.createAccessToken(userDto.getLogin());
         String refreshToken = userAuthenticationProvider.createRefreshToken(userDto.getLogin());
         userDto.setToken(accessToken);
+        userDto.setRefreshToken(refreshToken);
         return ResponseEntity.ok(userDto);
     }
 
@@ -40,6 +41,7 @@ public class AuthController {
         String accessToken = userAuthenticationProvider.createAccessToken(createdUser.getLogin());
         String refreshToken = userAuthenticationProvider.createRefreshToken(createdUser.getLogin());
         createdUser.setToken(accessToken);
+        createdUser.setRefreshToken(refreshToken);
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
     }
     @GetMapping("/validate-token")
