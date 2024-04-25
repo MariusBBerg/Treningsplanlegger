@@ -26,6 +26,7 @@ public class UserDto {
     private String token;
     private String refreshToken;
     private String email;
+    private Boolean isGoogleAuthenticated;
 
     private UserDto coach;
     

@@ -95,4 +95,8 @@ public class UserService {
         return userRepository.findByLoginContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(query, query, query);
     }
 
+    public void updateUser(User user) {
+        userRepository.save(user);
+    }
+
 }

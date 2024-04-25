@@ -79,7 +79,39 @@ const handleSubmit = async (e,client,user,setWorkouts,workoutData,setOpenAddWork
   }
 };
 
-export { fetchWorkouts, handleSubmitEdit, handleSubmit };
+
+const exportToGoogleCalendar = async (workout,user,setOpenAddWorkoutModal,setExportingWorkout,setWorkoutExported,setWorkoutNotExported) => {
+
+  if (!user || !user.token) {
+    console.error("Bruker er ikke autentisert.");
+    // Legg til logikk for å håndtere ikke-autentiserte brukere, f.eks. omdiriger til login
+    return;
+  }
+
+  setExportingWorkout(true);
+  try {
+    const response = await axios.post(API_URL + 'api/google-calendar/export-event', workout, {
+      headers: {
+        Authorization: `Bearer ${user.token}`, // Bruker token fra auth context
+      },});
+
+    if (response.status === 200) {
+      setWorkoutExported(true);
+    } else {
+      setWorkoutNotExported(true);
+    }
+  } catch (error) {
+    console.error('Error exporting to Google Calendar:', error);
+    setWorkoutNotExported(true);
+  }
+  finally {
+    setExportingWorkout(false);
+  }
+};
+
+
+
+export { fetchWorkouts, handleSubmitEdit, handleSubmit,exportToGoogleCalendar };
 
 
 
