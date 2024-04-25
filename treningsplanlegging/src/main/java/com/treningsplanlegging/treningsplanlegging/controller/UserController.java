@@ -70,7 +70,7 @@ public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto updatedUse
         throw new AppException("Email already exists", HttpStatus.BAD_REQUEST);
     }
     if (!currentUser.getLogin().equals(updatedUserDto.getLogin()) && userService.checkLoginExists(updatedUserDto.getLogin())) {
-        throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
+        throw new AppException("Username already exists", HttpStatus.BAD_REQUEST);
     }
 
     // Update the user data

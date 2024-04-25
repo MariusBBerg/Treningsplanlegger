@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 
 import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import Navigation from "../components/Navigation/Navigation";
 import axios from "axios";
 import Footer from "../components/Footer";
@@ -36,9 +37,10 @@ export default function ProfilePage() {
   const [calendarCreated, setCalendarCreated] = useState(false); //for å erstatte knap når ferdig'
   const [calendarNotCreated, setCalendarNotCreated] = useState(false); //for å vise feilmelding
 
+  const[updateUserError, setUpdateUserError] = useState("");
+
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    // Her kan du legge til logikk for å oppdatere brukerdata
     console.log("Form submitted");
     const userData = {
       firstName,
@@ -55,12 +57,18 @@ export default function ProfilePage() {
       //Oppdaterer med ny token
       if (response.data.token) {
         localStorage.setItem("user", JSON.stringify(response.data));
+        setOpen(false);
       }
     } catch (error) {
       console.error("Error updating user", error);
+      if (error.response && error.response.data) {
+        // If the server responds with a custom error message, display it
+        console.error('Server response:', error.response.data.message);
+        setUpdateUserError(error.response.data.message);
+      }
     }
 
-    setOpen(false);
+    
   };
 
   const handleCreateCalendar = async () => {
@@ -316,8 +324,21 @@ export default function ProfilePage() {
               <GoogleAuthButton />
             </Box>
           </Modal>
-
+          <Snackbar
+        open={!!updateUserError}
+        autoHideDuration={4000}
+        onClose={() => setUpdateUserError("")}
+      >
+        <Alert
+          onClose={() => setUpdateUserError("")}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {updateUserError}
+        </Alert>
+      </Snackbar>
       <Footer />
+
     </div>
   );
 }
