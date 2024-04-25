@@ -36,6 +36,14 @@ public class User {
 
     private String login;
 
+    private String GoogleAccessToken;
+
+    private String GoogleRefreshToken;
+    
+    private Boolean isGoogleAuthenticated;
+
+    private String CalendarId;
+
     @ManyToOne
     @JoinColumn(name = "coach_id")
     @JsonManagedReference

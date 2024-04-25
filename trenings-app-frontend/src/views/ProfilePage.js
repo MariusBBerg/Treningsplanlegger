@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -8,10 +8,16 @@ import {
   Modal,
   TextField,
 } from "@mui/material";
-import Navigation from '../components/Navigation/Navigation';
+
+import Alert from "@mui/material/Alert";
+import Navigation from "../components/Navigation/Navigation";
 import axios from "axios";
 import Footer from "../components/Footer";
 import { API_URL } from "../utils/api_url";
+import GoogleAuthButton from "../components/Workout/Hooks/GoogleAuthButton";
+
+import CircularProgress from "@mui/material/CircularProgress";
+
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
   const userStr = localStorage.getItem("user");
@@ -20,6 +26,10 @@ export default function ProfilePage() {
   const [lastName, setLastName] = useState(user.lastName);
   const [email, setEmail] = useState(user.email);
   const [login, setLogin] = useState(user.login);
+  const [googleConfigOpen, setGoogleConfigOpen] = useState(false);
+  const [creatingCalendar, setCreatingCalendar] = useState(false); //for spinner/loader
+  const [calendarCreated, setCalendarCreated] = useState(false); //for å erstatte knap når ferdig'
+  const [calendarNotCreated, setCalendarNotCreated] = useState(false); //for å vise feilmelding
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -32,18 +42,14 @@ export default function ProfilePage() {
       login,
     };
     try {
-      const response = await axios.put(
-        API_URL + "api/users/me",
-        userData,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
+      const response = await axios.put(API_URL + "api/users/me", userData, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       //Oppdaterer med ny token
       if (response.data.token) {
-        localStorage.setItem('user', JSON.stringify(response.data));
+        localStorage.setItem("user", JSON.stringify(response.data));
       }
     } catch (error) {
       console.error("Error updating user", error);
@@ -52,9 +58,47 @@ export default function ProfilePage() {
     setOpen(false);
   };
 
+  const handleCreateCalendar = async () => {
+    //TODO, GJØRE DENNE FINERE
+    const confirm = window.confirm(
+      "Are you sure you want to create a new calendar?"
+    );
+    if (!confirm) {
+      return;
+    }
+    setCreatingCalendar(true);
+
+    try {
+      const response = await axios.post(
+        API_URL + "api/google-calendar/create-calendar",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        console.log("Calendar created", response.data);
+        setCalendarCreated(true);
+      }
+      else{
+        setCalendarNotCreated(true);
+      }
+    } catch (error) {
+      console.error("Error creating calendar", error);
+      setCalendarNotCreated(true);
+      setTimeout(() => {
+        setCalendarNotCreated(false);
+      }, 1000);
+    } finally {
+      setCreatingCalendar(false);
+    }
+  };
+
   return (
-    <div className="theme-bg min-h-screen flex flex-col justify-between" >
-      <Navigation /> 
+    <div className="theme-bg min-h-screen flex flex-col justify-between">
+      <Navigation />
       <Container>
         <Box
           sx={{
@@ -82,6 +126,8 @@ export default function ProfilePage() {
           >
             Edit Profile
           </Button>
+
+          <GoogleAuthButton />
         </Box>
       </Container>
       <Modal
@@ -105,6 +151,7 @@ export default function ProfilePage() {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Edit Profile
           </Typography>
+
           <form onSubmit={handleFormSubmit}>
             <TextField
               margin="normal"
@@ -143,12 +190,69 @@ export default function ProfilePage() {
               defaultValue={user.email}
               onChange={(e) => setEmail(e.target.value)}
             />
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => setGoogleConfigOpen(true)}
+            >
+              Open Google Configuration
+            </Button>
             <Button type="submit" variant="contained" color="primary">
               Save Changes
             </Button>
           </form>
+          <Modal
+            open={googleConfigOpen}
+            onClose={() => setGoogleConfigOpen(false)}
+            aria-labelledby="google-config-modal-title"
+            aria-describedby="google-config-modal-description"
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 400,
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+              }}
+            >
+              <Typography
+                id="google-config-modal-title"
+                variant="h6"
+                component="h2"
+              >
+                Google Configuration
+              </Typography>
+
+              <p>More to come soon</p>
+
+              {creatingCalendar ? (
+                <CircularProgress sx={{ mt: 2 }} />
+              ) : calendarCreated ? (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                  Calendar created successfully!
+                </Alert>
+              ) : calendarNotCreated ? (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  Failed to create calendar
+                </Alert>
+              ) : (
+                <Button
+                  type="submit"
+                  variant="outlined"
+                  onClick={() => handleCreateCalendar()}
+                >
+                  Create new Calendar
+                </Button>
+              )}
+            </Box>
+          </Modal>
         </Box>
       </Modal>
+
       <Footer />
     </div>
   );

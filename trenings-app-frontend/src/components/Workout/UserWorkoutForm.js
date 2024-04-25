@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin from "@fullcalendar/interaction";
+
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Button, Modal, Label, Select } from "flowbite-react";
 import FullCalendarComponent from "./FullCalendarComponent.js";
-
+import {Box} from "@mui/material";
 import "moment/locale/nb";
 
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 import WeeklyRunningVolume from "./WeeklyRunningVolume.js";
 
 import {
   fetchWorkouts,
   handleSubmitEdit,
   handleSubmit,
+  exportToGoogleCalendar,
 } from "./Hooks/workoutApi.js";
+import GoogleAuthButton from "./Hooks/GoogleAuthButton.js";
+import { set } from "date-fns";
 
 moment.locale("nb");
 
@@ -36,6 +38,10 @@ const UserWorkoutForm = () => {
   const [workouts, setWorkouts] = useState([]);
   const [selectedWorkout, setSelectedWorkout] = useState(""); // // Valgt treningsøkt i kalenderen
 
+
+  const [exportingWorkout, setExportingWorkout] = useState(false); //for spinner/loader
+  const [workoutExported, setWorkoutExported] = useState(false); //for å erstatte knap når ferdig'
+  const [workoutNotExported, setWorkoutNotExported] = useState(false); //for å vise feilmelding
   useEffect(() => {
     fetchWorkouts(null, user, setWorkouts);
   }, [user.login]); //ENDRES HVER GANG BRUKER-OBJEKTET
@@ -58,6 +64,8 @@ const UserWorkoutForm = () => {
       setDistance("");
       setDuration("");
       setZone("");
+
+
     }
   }, [openAddWorkoutModal]);
   
@@ -74,6 +82,12 @@ const UserWorkoutForm = () => {
       setZone(selectedWorkout.intensityZone || "");
     }
   }, [selectedWorkout, openEditWorkoutModal]);
+
+  useEffect(() => {
+    setExportingWorkout(false);
+    setWorkoutExported(false);
+    setWorkoutNotExported(false);
+},[openViewWorkoutModal])
   
 
   return (
@@ -323,6 +337,28 @@ const UserWorkoutForm = () => {
           >
             Edit
           </Button>
+          {exportingWorkout ? (
+                <CircularProgress sx={{ mt: 2 }} />
+              ) : workoutExported ? (
+                <Alert severity="success" >
+                  Workout exported successfully!
+                </Alert>
+              ) : workoutNotExported ? (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  Failed to export workout
+                </Alert>
+              ) : (
+          <Button
+            color="blue"
+            onClick={() => {
+              if (selectedWorkout) {
+                exportToGoogleCalendar(selectedWorkout,user,setOpenAddWorkoutModal,setExportingWorkout,setWorkoutExported,setWorkoutNotExported); // Kall eksportfunksjonen når knappen klikkes
+              }
+            }}
+          >
+            Export to Google Calendar
+          </Button>
+           )}
         </Modal.Footer>
       </Modal>
 
@@ -507,11 +543,23 @@ const UserWorkoutForm = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
       <WeeklyRunningVolume
         client={user}
         week={currentWeek}
         workouts={workouts}
       />
+            {user && !user.isGoogleAuthenticated && 
+      <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <GoogleAuthButton/>
+      </Box>}
     </div>
   );
 };
