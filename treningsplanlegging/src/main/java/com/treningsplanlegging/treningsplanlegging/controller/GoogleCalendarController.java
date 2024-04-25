@@ -57,7 +57,6 @@ public class GoogleCalendarController {
     private static final String APPLICATION_NAME = "Treningsplanleggeren";
 
     private static final List<String> SCOPES = Arrays.asList(
-            "https://www.googleapis.com/auth/calendar.events",
             "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
             "https://www.googleapis.com/auth/calendar.app.created");
 

@@ -17,7 +17,6 @@ const GoogleAuthButton = () => {
         '&redirect_uri=' + redirectUri +
         '&response_type=code' +
         '&scope=' + encodeURIComponent(
-          'https://www.googleapis.com/auth/calendar.events ' +
           'https://www.googleapis.com/auth/calendar.calendarlist.readonly ' +
           'https://www.googleapis.com/auth/calendar.app.created'
         );
