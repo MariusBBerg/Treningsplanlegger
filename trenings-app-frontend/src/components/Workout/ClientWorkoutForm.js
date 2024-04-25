@@ -12,11 +12,15 @@ import {
 } from "./Hooks/workoutApi.js";
 
 import FullCalendarComponent from "./FullCalendarComponent.js";
+
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+
 moment.locale("nb");
 
 const ClientWorkoutForm = () => {
   const [date, setDate] = useState("");
-  const [name,setName] = useState("")
+  const [name, setName] = useState("");
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
@@ -38,14 +42,11 @@ const ClientWorkoutForm = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await axios.get(
-        API_URL + `api/workouts/clients`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
+      const response = await axios.get(API_URL + `api/workouts/clients`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       setClients(response.data);
     } catch (error) {
       console.error("An error occurred while fetching clients", error);
@@ -166,22 +167,21 @@ const ClientWorkoutForm = () => {
                   <option value="Cardio">General Cardio</option>
                 </Select>
                 <div className="max-w-sm py-2">
-                    <label
-                      htmlFor="name"
-                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
-                    >
-                      Name:
-                    </label>
-                    <input
-                      type="text"
-                      required 
-                      id="distance"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                
-              </div>
+                  <label
+                    htmlFor="name"
+                    className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                  >
+                    Name:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    id="distance"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
               </div>
               {type === "Løping" && (
                 <>
@@ -289,11 +289,6 @@ const ClientWorkoutForm = () => {
             </form>
           </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenAddWorkoutModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
       </Modal>
 
       <Modal
@@ -301,42 +296,51 @@ const ClientWorkoutForm = () => {
         onClose={() => setOpenViewWorkoutModal(false)}
       >
         <Modal.Body>
+          <IconButton
+            aria-label="close"
+            onClick={() => setOpenViewWorkoutModal(false)}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
           {selectedWorkout && (
-              <div className="space-y-6">
-                <div className="max-w-md py-2">
-                  <h2 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-                    {selectedWorkout.name}
-                  </h2>
-                  <p className="text-sm text-gray-900 dark:text-white">
-                    Date: {formatDate(selectedWorkout.start)}
-                  </p>
-                  <p className="text-sm text-gray-900 dark:text-white">
-                    Type: {selectedWorkout.type}
-                  </p>
-                  {selectedWorkout.type === "Løping" && (
-                    <>
-                      <p className="text-sm text-gray-900 dark:text-white">
-                        Duration: {selectedWorkout.duration} minutes
-                      </p>
-                      <p className="text-sm text-gray-900 dark:text-white">
-                        Distance: {selectedWorkout.distance} km
-                      </p>
-                      <p className="text-sm text-gray-900 dark:text-white">
-                        Intensity: Zone {selectedWorkout.intensity}
-                      </p>
-                    </>
-                  )}
-                  <p className="text-sm text-gray-900 dark:text-white">
-                    Description: {selectedWorkout.description}
-                  </p>
-                </div>
+            <div className="space-y-6">
+              <div className="max-w-md py-2">
+                <h2 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                  {selectedWorkout.name}
+                </h2>
+                <p className="text-sm text-gray-900 dark:text-white">
+                  Date: {formatDate(selectedWorkout.start)}
+                </p>
+                <p className="text-sm text-gray-900 dark:text-white">
+                  Type: {selectedWorkout.type}
+                </p>
+                {selectedWorkout.type === "Løping" && (
+                  <>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      Duration: {selectedWorkout.duration} minutes
+                    </p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      Distance: {selectedWorkout.distance} km
+                    </p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      Intensity: Zone {selectedWorkout.intensity}
+                    </p>
+                  </>
+                )}
+                <p className="text-sm text-gray-900 dark:text-white">
+                  Description: {selectedWorkout.description}
+                </p>
               </div>
-            )}
+            </div>
+          )}
         </Modal.Body>
         <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenViewWorkoutModal(false)}>
-            Close
-          </Button>
           <Button
             color="gray"
             onClick={() => {
@@ -401,22 +405,21 @@ const ClientWorkoutForm = () => {
                   <option value="Cardio">General Cardio</option>
                 </Select>
                 <div className="max-w-sm py-2">
-                    <label
-                      htmlFor="name"
-                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
-                    >
-                      Name:
-                    </label>
-                    <input
-                      type="text"
-                      required 
-                      id="distance"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                
-              </div>
+                  <label
+                    htmlFor="name"
+                    className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                  >
+                    Name:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    id="distance"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
               </div>
               {type === "Løping" && (
                 <>
@@ -520,11 +523,6 @@ const ClientWorkoutForm = () => {
             </form>
           </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenAddWorkoutModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
       </Modal>
 
       <WeeklyRunningVolume

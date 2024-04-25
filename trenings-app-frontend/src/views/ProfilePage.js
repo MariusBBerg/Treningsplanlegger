@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 
 import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import Navigation from "../components/Navigation/Navigation";
 import axios from "axios";
 import Footer from "../components/Footer";
@@ -17,6 +18,11 @@ import { API_URL } from "../utils/api_url";
 import GoogleAuthButton from "../components/Workout/Hooks/GoogleAuthButton";
 
 import CircularProgress from "@mui/material/CircularProgress";
+
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
@@ -31,9 +37,10 @@ export default function ProfilePage() {
   const [calendarCreated, setCalendarCreated] = useState(false); //for å erstatte knap når ferdig'
   const [calendarNotCreated, setCalendarNotCreated] = useState(false); //for å vise feilmelding
 
+  const[updateUserError, setUpdateUserError] = useState("");
+
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    // Her kan du legge til logikk for å oppdatere brukerdata
     console.log("Form submitted");
     const userData = {
       firstName,
@@ -50,12 +57,18 @@ export default function ProfilePage() {
       //Oppdaterer med ny token
       if (response.data.token) {
         localStorage.setItem("user", JSON.stringify(response.data));
+        setOpen(false);
       }
     } catch (error) {
       console.error("Error updating user", error);
+      if (error.response && error.response.data) {
+        // If the server responds with a custom error message, display it
+        console.error('Server response:', error.response.data.message);
+        setUpdateUserError(error.response.data.message);
+      }
     }
 
-    setOpen(false);
+    
   };
 
   const handleCreateCalendar = async () => {
@@ -81,8 +94,7 @@ export default function ProfilePage() {
       if (response.status === 200) {
         console.log("Calendar created", response.data);
         setCalendarCreated(true);
-      }
-      else{
+      } else {
         setCalendarNotCreated(true);
       }
     } catch (error) {
@@ -127,7 +139,7 @@ export default function ProfilePage() {
             Edit Profile
           </Button>
 
-          <GoogleAuthButton />
+          {!user.isGoogleAuthenticated && <GoogleAuthButton />}
         </Box>
       </Container>
       <Modal
@@ -142,12 +154,24 @@ export default function ProfilePage() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 400, // specify a fixed width
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
           }}
         >
+          <IconButton
+            aria-label="close"
+            onClick={() => setOpen(false)}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Edit Profile
           </Typography>
@@ -193,15 +217,25 @@ export default function ProfilePage() {
             <Button
               variant="contained"
               color="secondary"
-              onClick={() => setGoogleConfigOpen(true)}
+              onClick={() => {
+                setGoogleConfigOpen(true); // Open the second modal
+              }}
             >
               Open Google Configuration
             </Button>
-            <Button type="submit" variant="contained" color="primary">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              sx={{ mt: "30px" }}
+            >
               Save Changes
             </Button>
           </form>
-          <Modal
+          
+        </Box>
+      </Modal>
+      <Modal
             open={googleConfigOpen}
             onClose={() => setGoogleConfigOpen(false)}
             aria-labelledby="google-config-modal-title"
@@ -214,46 +248,97 @@ export default function ProfilePage() {
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 width: 400,
+                height: 500,
                 bgcolor: "background.paper",
-                boxShadow: 24,
+                boxShadow: 0,
                 p: 4,
+                borderRadius: 2,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 2,
               }}
             >
+              <IconButton
+                aria-label="close"
+                onClick={() => setGoogleConfigOpen(false)}
+                sx={{
+                  position: "absolute",
+                  right: 8,
+                  top: 8,
+                  color: (theme) => theme.palette.grey[500],
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
               <Typography
                 id="google-config-modal-title"
                 variant="h6"
                 component="h2"
+                sx={{ alignSelf: "middle" }} // Align title to the start
               >
-                Google Configuration
+                Google Calendar Configuration
               </Typography>
 
-              <p>More to come soon</p>
+              <Typography variant="body1" color="text.secondary">
+                More to come soon
+              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {user.isGoogleAuthenticated ? (
+                  <>
+                    <CheckCircleIcon color="success" />
+                    <Typography variant="body2" color="text.secondary">
+                      Connected to Google
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <CancelIcon color="error" />
+                    <Typography variant="body2" color="text.secondary">
+                      Not connected to Google
+                    </Typography>
+                  </>
+                )}
+              </Box>
 
               {creatingCalendar ? (
-                <CircularProgress sx={{ mt: 2 }} />
+                <CircularProgress />
               ) : calendarCreated ? (
-                <Alert severity="success" sx={{ mt: 2 }}>
-                  Calendar created successfully!
-                </Alert>
+                <Alert severity="success">Calendar created successfully!</Alert>
               ) : calendarNotCreated ? (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  Failed to create calendar
-                </Alert>
+                <Alert severity="error">Failed to create calendar</Alert>
               ) : (
                 <Button
                   type="submit"
-                  variant="outlined"
+                  variant="contained"
+                  color="primary"
                   onClick={() => handleCreateCalendar()}
                 >
-                  Create new Calendar
+                  Create A new Calendar
                 </Button>
               )}
+              <Typography variant="body1" sx={{ textAlign: "center" }}>
+                Reconnect your account to google, or to another google account
+              </Typography>
+
+              <GoogleAuthButton />
             </Box>
           </Modal>
-        </Box>
-      </Modal>
-
+          <Snackbar
+        open={!!updateUserError}
+        autoHideDuration={4000}
+        onClose={() => setUpdateUserError("")}
+      >
+        <Alert
+          onClose={() => setUpdateUserError("")}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {updateUserError}
+        </Alert>
+      </Snackbar>
       <Footer />
+
     </div>
   );
 }
