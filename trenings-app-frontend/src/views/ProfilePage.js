@@ -20,6 +20,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
@@ -207,7 +209,9 @@ export default function ProfilePage() {
             <Button
               variant="contained"
               color="secondary"
-              onClick={() => setGoogleConfigOpen(true)}
+              onClick={() => {
+                setGoogleConfigOpen(true); // Open the second modal
+              }}
             >
               Open Google Configuration
             </Button>
@@ -220,7 +224,10 @@ export default function ProfilePage() {
               Save Changes
             </Button>
           </form>
-          <Modal
+          
+        </Box>
+      </Modal>
+      <Modal
             open={googleConfigOpen}
             onClose={() => setGoogleConfigOpen(false)}
             aria-labelledby="google-config-modal-title"
@@ -232,11 +239,16 @@ export default function ProfilePage() {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: 400, // specify the same fixed width
-                height: 500, // specify the same fixed height
+                width: 400,
+                height: 500,
                 bgcolor: "background.paper",
-                boxShadow: 24,
+                boxShadow: 0,
                 p: 4,
+                borderRadius: 2,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 2,
               }}
             >
               <IconButton
@@ -255,35 +267,55 @@ export default function ProfilePage() {
                 id="google-config-modal-title"
                 variant="h6"
                 component="h2"
+                sx={{ alignSelf: "middle" }} // Align title to the start
               >
-                Google Configuration
+                Google Calendar Configuration
               </Typography>
 
-              <p>More to come soon</p>
+              <Typography variant="body1" color="text.secondary">
+                More to come soon
+              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {user.isGoogleAuthenticated ? (
+                  <>
+                    <CheckCircleIcon color="success" />
+                    <Typography variant="body2" color="text.secondary">
+                      Connected to Google
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <CancelIcon color="error" />
+                    <Typography variant="body2" color="text.secondary">
+                      Not connected to Google
+                    </Typography>
+                  </>
+                )}
+              </Box>
 
               {creatingCalendar ? (
-                <CircularProgress sx={{ mt: 2 }} />
+                <CircularProgress />
               ) : calendarCreated ? (
-                <Alert severity="success" sx={{ mt: 2 }}>
-                  Calendar created successfully!
-                </Alert>
+                <Alert severity="success">Calendar created successfully!</Alert>
               ) : calendarNotCreated ? (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  Failed to create calendar
-                </Alert>
+                <Alert severity="error">Failed to create calendar</Alert>
               ) : (
                 <Button
                   type="submit"
-                  variant="outlined"
+                  variant="contained"
+                  color="primary"
                   onClick={() => handleCreateCalendar()}
                 >
-                  Create new Calendar
+                  Create A new Calendar
                 </Button>
               )}
+              <Typography variant="body1" sx={{ textAlign: "center" }}>
+                Reconnect your account to google, or to another google account
+              </Typography>
+
+              <GoogleAuthButton />
             </Box>
           </Modal>
-        </Box>
-      </Modal>
 
       <Footer />
     </div>
