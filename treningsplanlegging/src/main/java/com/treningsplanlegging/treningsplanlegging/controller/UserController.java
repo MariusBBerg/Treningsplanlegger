@@ -3,6 +3,7 @@ package com.treningsplanlegging.treningsplanlegging.controller;
 import com.treningsplanlegging.treningsplanlegging.config.UserAuthenticationProvider;
 import com.treningsplanlegging.treningsplanlegging.dto.UserDto;
 import com.treningsplanlegging.treningsplanlegging.entity.User;
+import com.treningsplanlegging.treningsplanlegging.exceptions.AppException;
 import com.treningsplanlegging.treningsplanlegging.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,38 +54,44 @@ public class UserController {
     }
 
     
-    @PutMapping("/me")
-    public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto updatedUserDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        String login = authentication.getName();
-
-        User currentUser = userRepository.findByLogin(login)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
-
-        // Update the user data
-        currentUser.setFirstName(updatedUserDto.getFirstName());
-        currentUser.setEmail(updatedUserDto.getEmail());
-        currentUser.setLastName(updatedUserDto.getLastName());
-        currentUser.setLogin(updatedUserDto.getLogin());
-        // Add any other fields that the user is allowed to update
-
-        userRepository.save(currentUser);
-
-        //MÅ generere en ny token, siden nå er brukernavnet endret. Ser i retrospektiv at jeg burde brukt ID og ikke login som verdi i tokenet.
-        Authentication updatedAuthentication = new UsernamePasswordAuthenticationToken(updatedUserDto.getLogin(), null, authentication.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(updatedAuthentication);
-
-
-        
-        UserDto updatedUser = userMapper.toUserDto(currentUser);
-        updatedUser.setToken(userAuthenticationProvider.createAccessToken(updatedUser.getLogin()));
-        updatedUser.setRefreshToken(userAuthenticationProvider.createRefreshToken(updatedUser.getLogin()));
-        //Returnerer objektet med den nye tokenen
-        return ResponseEntity.ok(updatedUser);
+   @PutMapping("/me")
+public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto updatedUserDto) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || !authentication.isAuthenticated()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+    String login = authentication.getName();
+
+    User currentUser = userRepository.findByLogin(login)
+            .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
+
+    // Check if another user has the same email or login
+    if (!currentUser.getEmail().equals(updatedUserDto.getEmail()) && userService.checkEmailExists(updatedUserDto.getEmail())) {
+        throw new AppException("Email already exists", HttpStatus.BAD_REQUEST);
+    }
+    if (!currentUser.getLogin().equals(updatedUserDto.getLogin()) && userService.checkLoginExists(updatedUserDto.getLogin())) {
+        throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
+    }
+
+    // Update the user data
+    currentUser.setFirstName(updatedUserDto.getFirstName());
+    currentUser.setEmail(updatedUserDto.getEmail());
+    currentUser.setLastName(updatedUserDto.getLastName());
+    currentUser.setLogin(updatedUserDto.getLogin());
+    // Add any other fields that the user is allowed to update
+
+    userRepository.save(currentUser);
+
+    // Generate a new token, since the username is now changed.
+    Authentication updatedAuthentication = new UsernamePasswordAuthenticationToken(updatedUserDto.getLogin(), null, authentication.getAuthorities());
+    SecurityContextHolder.getContext().setAuthentication(updatedAuthentication);
+
+    UserDto updatedUser = userMapper.toUserDto(currentUser);
+    updatedUser.setToken(userAuthenticationProvider.createAccessToken(updatedUser.getLogin()));
+    updatedUser.setRefreshToken(userAuthenticationProvider.createRefreshToken(updatedUser.getLogin()));
+    // Return the object with the new token
+    return ResponseEntity.ok(updatedUser);
+}
 
 
     @DeleteMapping("/clients/{clientId}")

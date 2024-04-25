@@ -98,5 +98,13 @@ public class UserService {
     public void updateUser(User user) {
         userRepository.save(user);
     }
+    public boolean checkEmailExists(String email) {
+        return userRepository.findByEmailIgnoreCase(email).isPresent();
+    }
+    
+    public boolean checkLoginExists(String login) {
+        return userRepository.findByLoginIgnoreCase(login).isPresent();
+    }
+    
 
 }
