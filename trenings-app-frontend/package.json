@@ -68,6 +68,11 @@
     ]
   },
   "devDependencies": {
-    "@mightymeld/runtime": "^0.1.49"
+    "@babel/core": "^7.24.4",
+    "@babel/preset-env": "^7.24.4",
+    "@mightymeld/runtime": "^0.1.49",
+    "axios-mock-adapter": "^1.22.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^27.5.1"
   }
 }
