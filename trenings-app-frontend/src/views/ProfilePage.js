@@ -18,6 +18,9 @@ import GoogleAuthButton from "../components/Workout/Hooks/GoogleAuthButton";
 
 import CircularProgress from "@mui/material/CircularProgress";
 
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
   const userStr = localStorage.getItem("user");
@@ -81,8 +84,7 @@ export default function ProfilePage() {
       if (response.status === 200) {
         console.log("Calendar created", response.data);
         setCalendarCreated(true);
-      }
-      else{
+      } else {
         setCalendarNotCreated(true);
       }
     } catch (error) {
@@ -127,7 +129,7 @@ export default function ProfilePage() {
             Edit Profile
           </Button>
 
-          <GoogleAuthButton />
+          {!user.isGoogleAuthenticated && <GoogleAuthButton />}
         </Box>
       </Container>
       <Modal
@@ -142,12 +144,24 @@ export default function ProfilePage() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 400, // specify a fixed width
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
           }}
         >
+          <IconButton
+            aria-label="close"
+            onClick={() => setOpen(false)}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Edit Profile
           </Typography>
@@ -197,7 +211,12 @@ export default function ProfilePage() {
             >
               Open Google Configuration
             </Button>
-            <Button type="submit" variant="contained" color="primary">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              sx={{ mt: "30px" }}
+            >
               Save Changes
             </Button>
           </form>
@@ -213,12 +232,25 @@ export default function ProfilePage() {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: 400,
+                width: 400, // specify the same fixed width
+                height: 500, // specify the same fixed height
                 bgcolor: "background.paper",
                 boxShadow: 24,
                 p: 4,
               }}
             >
+              <IconButton
+                aria-label="close"
+                onClick={() => setGoogleConfigOpen(false)}
+                sx={{
+                  position: "absolute",
+                  right: 8,
+                  top: 8,
+                  color: (theme) => theme.palette.grey[500],
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
               <Typography
                 id="google-config-modal-title"
                 variant="h6"

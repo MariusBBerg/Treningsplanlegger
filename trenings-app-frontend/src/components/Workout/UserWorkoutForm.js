@@ -4,12 +4,15 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Button, Modal, Label, Select } from "flowbite-react";
 import FullCalendarComponent from "./FullCalendarComponent.js";
-import {Box} from "@mui/material";
+import { Box } from "@mui/material";
 import "moment/locale/nb";
 
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
 import WeeklyRunningVolume from "./WeeklyRunningVolume.js";
+
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 
 import {
   fetchWorkouts,
@@ -38,7 +41,6 @@ const UserWorkoutForm = () => {
   const [workouts, setWorkouts] = useState([]);
   const [selectedWorkout, setSelectedWorkout] = useState(""); // // Valgt treningsøkt i kalenderen
 
-
   const [exportingWorkout, setExportingWorkout] = useState(false); //for spinner/loader
   const [workoutExported, setWorkoutExported] = useState(false); //for å erstatte knap når ferdig'
   const [workoutNotExported, setWorkoutNotExported] = useState(false); //for å vise feilmelding
@@ -64,11 +66,9 @@ const UserWorkoutForm = () => {
       setDistance("");
       setDuration("");
       setZone("");
-
-
     }
   }, [openAddWorkoutModal]);
-  
+
   useEffect(() => {
     if (openEditWorkoutModal && selectedWorkout) {
       // Sett feltene basert på verdiene i valgt treningsøkt
@@ -87,8 +87,7 @@ const UserWorkoutForm = () => {
     setExportingWorkout(false);
     setWorkoutExported(false);
     setWorkoutNotExported(false);
-},[openViewWorkoutModal])
-  
+  }, [openViewWorkoutModal]);
 
   return (
     <div>
@@ -152,7 +151,7 @@ const UserWorkoutForm = () => {
                 <Select
                   id="type"
                   value={type}
-                  required 
+                  required
                   onChange={(e) => setType(e.target.value)}
                 >
                   <option value="">Choose a type</option>
@@ -161,22 +160,21 @@ const UserWorkoutForm = () => {
                   <option value="Cardio">General Cardio</option>
                 </Select>
                 <div className="max-w-sm py-2">
-                    <label
-                      htmlFor="name"
-                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
-                    >
-                      Name:
-                    </label>
-                    <input
-                      type="text"
-                      required 
-                      id="distance"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                
-              </div>
+                  <label
+                    htmlFor="name"
+                    className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                  >
+                    Name:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    id="distance"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
               </div>
               {type === "Løping" && (
                 <>
@@ -280,17 +278,24 @@ const UserWorkoutForm = () => {
             </form>
           </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenAddWorkoutModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
       </Modal>
 
       <Modal
         show={openViewWorkoutModal}
         onClose={() => setOpenViewWorkoutModal(false)}
       >
+        <IconButton
+          aria-label="close"
+          onClick={() => setOpenViewWorkoutModal(false)}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
         <Modal.Body>
           {selectedWorkout && (
             <div className="space-y-6">
@@ -325,9 +330,6 @@ const UserWorkoutForm = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenViewWorkoutModal(false)}>
-            Close
-          </Button>
           <Button
             color="gray"
             onClick={() => {
@@ -338,27 +340,32 @@ const UserWorkoutForm = () => {
             Edit
           </Button>
           {exportingWorkout ? (
-                <CircularProgress sx={{ mt: 2 }} />
-              ) : workoutExported ? (
-                <Alert severity="success" >
-                  Workout exported successfully!
-                </Alert>
-              ) : workoutNotExported ? (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  Failed to export workout
-                </Alert>
-              ) : (
-          <Button
-            color="blue"
-            onClick={() => {
-              if (selectedWorkout) {
-                exportToGoogleCalendar(selectedWorkout,user,setOpenAddWorkoutModal,setExportingWorkout,setWorkoutExported,setWorkoutNotExported); // Kall eksportfunksjonen når knappen klikkes
-              }
-            }}
-          >
-            Export to Google Calendar
-          </Button>
-           )}
+            <CircularProgress sx={{ mt: 2 }} />
+          ) : workoutExported ? (
+            <Alert severity="success">Workout exported successfully!</Alert>
+          ) : workoutNotExported ? (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              Failed to export workout
+            </Alert>
+          ) : (
+            <Button
+              color="blue"
+              onClick={() => {
+                if (selectedWorkout) {
+                  exportToGoogleCalendar(
+                    selectedWorkout,
+                    user,
+                    setOpenAddWorkoutModal,
+                    setExportingWorkout,
+                    setWorkoutExported,
+                    setWorkoutNotExported
+                  ); // Kall eksportfunksjonen når knappen klikkes
+                }
+              }}
+            >
+              Export to Google Calendar
+            </Button>
+          )}
         </Modal.Footer>
       </Modal>
 
@@ -418,22 +425,21 @@ const UserWorkoutForm = () => {
                   <option value="Cardio">General Cardio</option>
                 </Select>
                 <div className="max-w-sm py-2">
-                    <label
-                      htmlFor="name"
-                      className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
-                    >
-                      Name:
-                    </label>
-                    <input
-                      type="text"
-                      required 
-                      id="distance"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                
-              </div>
+                  <label
+                    htmlFor="name"
+                    className="block mb-2 text-sm font-medium-text-gray-900 dark:text-white"
+                  >
+                    Name:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    id="distance"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
               </div>
               {type === "Løping" && (
                 <>
@@ -537,11 +543,6 @@ const UserWorkoutForm = () => {
             </form>
           </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenEditWorkoutModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
       </Modal>
 
       <WeeklyRunningVolume
@@ -549,17 +550,18 @@ const UserWorkoutForm = () => {
         week={currentWeek}
         workouts={workouts}
       />
-            {user && !user.isGoogleAuthenticated && 
-      <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <GoogleAuthButton/>
-      </Box>}
+      {user && !user.isGoogleAuthenticated && (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <GoogleAuthButton />
+        </Box>
+      )}
     </div>
   );
 };
