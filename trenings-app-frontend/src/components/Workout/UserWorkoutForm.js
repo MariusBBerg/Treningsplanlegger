@@ -16,7 +16,9 @@ import {
   fetchWorkouts,
   handleSubmitEdit,
   handleSubmit,
+  exportToGoogleCalendar,
 } from "./Hooks/workoutApi.js";
+import GoogleAuthButton from "./Hooks/GoogleAuthButton.js";
 
 moment.locale("nb");
 
@@ -323,6 +325,16 @@ const UserWorkoutForm = () => {
           >
             Edit
           </Button>
+          <Button
+            color="blue"
+            onClick={() => {
+              if (selectedWorkout) {
+                exportToGoogleCalendar(selectedWorkout,user); // Kall eksportfunksjonen når knappen klikkes
+              }
+            }}
+          >
+            Export to Google Calendar
+          </Button>
         </Modal.Footer>
       </Modal>
 
@@ -507,6 +519,7 @@ const UserWorkoutForm = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <GoogleAuthButton/>
       <WeeklyRunningVolume
         client={user}
         week={currentWeek}

@@ -14,6 +14,7 @@ import ProfilePage from "./views/ProfilePage.js";
 import ClientList from "./views/ClientList.js";
 import ClientDashboard from "./views/ClientDashboard.js";
 import checkAuth from "./views/Hooks/checkAuth.js";
+import OAuthCallback from "./components/Workout/Hooks/OAuthCallback.js";
 
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
 
           <Route path="/profile" element={<ProtectedRoute><ProfilePage  /></ProtectedRoute>} />
           <Route path="/logout" element={<Logout />} />
+          <Route path="/googlecalendar/callback" element={<OAuthCallback />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
