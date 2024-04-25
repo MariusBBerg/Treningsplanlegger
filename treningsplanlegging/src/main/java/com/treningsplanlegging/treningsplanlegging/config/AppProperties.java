@@ -9,6 +9,7 @@ public class AppProperties {
 
     private String clientSecret;
     private String frontendUrl;
+    private String clientId;
 
     // getters and setters
 
@@ -25,5 +26,11 @@ public class AppProperties {
 
     public void setFrontendUrl(String frontendUrl) {
         this.frontendUrl = frontendUrl;
+    }
+    public String getClientId() {
+        return clientId;
+    }
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 }

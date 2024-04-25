@@ -51,8 +51,8 @@ import java.util.List;
 @RequestMapping("/api/google-calendar")
 public class GoogleCalendarController {
 
-    private static final String CLIENT_ID = "589841951698-k4dn8c07qbhmhqp50vhb428gpa36iup1.apps.googleusercontent.com";
-    private final String CLIENT_SECRET;
+    private String CLIENT_SECRET;
+    private String CLIENT_ID;
 
     private String REDIRECT_URI;
     private static final String APPLICATION_NAME = "Treningsplanleggeren";
@@ -72,6 +72,7 @@ public class GoogleCalendarController {
         this.appProperties = appProperties;
         this.CLIENT_SECRET = appProperties.getClientSecret();
         this.frontend_url = appProperties.getFrontendUrl();
+        this.CLIENT_ID = appProperties.getClientId();
         this.REDIRECT_URI = frontend_url + "googlecalendar/callback";
 
         this.flow = new GoogleAuthorizationCodeFlow.Builder(
