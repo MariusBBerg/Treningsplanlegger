@@ -22,6 +22,7 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.treningsplanlegging.treningsplanlegging.config.AppProperties;
 import com.treningsplanlegging.treningsplanlegging.dto.UserDto;
 import com.treningsplanlegging.treningsplanlegging.dto.WorkoutDto;
 import com.treningsplanlegging.treningsplanlegging.entity.User;
@@ -51,11 +52,11 @@ import java.util.List;
 public class GoogleCalendarController {
 
     private static final String CLIENT_ID = "589841951698-k4dn8c07qbhmhqp50vhb428gpa36iup1.apps.googleusercontent.com";
-    private static final String CLIENT_SECRET = "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";
+    private final String CLIENT_SECRET;
 
-    private static final String REDIRECT_URI = "http://localhost:3000/googlecalendar/callback";
+    private String REDIRECT_URI;
     private static final String APPLICATION_NAME = "Treningsplanleggeren";
-
+    private final String frontend_url;
     private static final List<String> SCOPES = Arrays.asList(
             "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
             "https://www.googleapis.com/auth/calendar.app.created");
@@ -65,8 +66,14 @@ public class GoogleCalendarController {
     private final UserService userService;
     private final UserRepository userRepository;
     private User currentUser;
+    private final AppProperties appProperties;
 
-    public GoogleCalendarController(UserService userService, UserRepository userRepository) throws Exception {
+    public GoogleCalendarController(UserService userService, UserRepository userRepository, AppProperties appProperties) throws Exception {
+        this.appProperties = appProperties;
+        this.CLIENT_SECRET = appProperties.getClientSecret();
+        this.frontend_url = appProperties.getFrontendUrl();
+        this.REDIRECT_URI = frontend_url + "googlecalendar/callback";
+
         this.flow = new GoogleAuthorizationCodeFlow.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
                 JSON_FACTORY,
