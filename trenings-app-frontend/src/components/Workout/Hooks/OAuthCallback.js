@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { API_URL } from "../../../utils/api_url";
 import { Navigate } from "react-router-dom";
+import { CircularProgress } from '@mui/material';
+
 
 // Funksjon for å håndtere callback og sende koden til backend
 const handleOAuthCallback = async () => {
@@ -50,7 +52,11 @@ const OAuthCallback = () => {
     return <Navigate to="/dashboard" />; // Returner JSX-komponenten for å utløse omdirigering
   }
 
-  return <div>Håndterer Google OAuth callback...</div>;
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <CircularProgress />
+    </div>
+  );
 };
 
 export default OAuthCallback;
