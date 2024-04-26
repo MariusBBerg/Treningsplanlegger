@@ -20,8 +20,7 @@ import {
   handleSubmit,
   exportToGoogleCalendar,
 } from "./Hooks/workoutApi.js";
-import GoogleAuthButton from "./Hooks/GoogleAuthButton.js";
-import { set } from "date-fns";
+import authorizeGoogleOAuth from "../../services/GoogleServices/authorizeGoogleOAuth.js";
 
 moment.locale("nb");
 
@@ -559,7 +558,7 @@ const UserWorkoutForm = () => {
             justifyContent: "center",
           }}
         >
-          <GoogleAuthButton />
+          <Button onclick={authorizeGoogleOAuth()}>Google Auth</Button>
         </Box>
       )}
     </div>
