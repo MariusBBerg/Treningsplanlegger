@@ -53,7 +53,33 @@ const ClientWorkoutForm = () => {
       console.error("An error occurred while fetching clients", error);
     }
   };
+  useEffect(() => {
+    if (openAddWorkoutModal) {
+      // Reset standardverdiene når modalen for å legge til ny trening åpnes
+      setTime("12:00"); // Standardverdien for tid
+      setName("");
+      setDescription("");
+      setType("");
+      setDistance("");
+      setDuration("");
+      setZone("");
+    }
+  }, [openAddWorkoutModal]);
 
+  useEffect(() => {
+    if (openEditWorkoutModal && selectedWorkout) {
+      // Sett feltene basert på verdiene i valgt treningsøkt
+      setDate(moment(selectedWorkout.date).format("YYYY-MM-DD"));
+      setTime(moment(selectedWorkout.date).format("HH:mm"));
+      setName(selectedWorkout.name || "");
+      setDescription(selectedWorkout.description || "");
+      setType(selectedWorkout.type || "");
+      setDistance(selectedWorkout.distance || "");
+      setDuration(selectedWorkout.duration || "");
+      setZone(selectedWorkout.intensityZone || "");
+    }
+  }, [selectedWorkout, openEditWorkoutModal]);
+  
   useEffect(() => {
     fetchWorkouts(client, user, setWorkouts);
   }, [client]);
