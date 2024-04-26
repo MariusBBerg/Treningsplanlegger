@@ -4,6 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import moment from "moment";
+import { exportToGoogleCalendar } from "./Hooks/workoutApi";
 
 const FullCalendarComponent = ({
   setDate,
@@ -18,6 +19,12 @@ const FullCalendarComponent = ({
   const calendarRef = useRef(null);
   const [calendar, setCalendar] = useState(null);
   const [currentView, setCurrentView] = useState('dayGridMonth');
+
+  
+
+   
+
+
   
 
   useEffect(() => {
@@ -115,6 +122,7 @@ useEffect(() => {
       >
         Weekly
       </button>
+
       <button 
         onClick={() => handleViewChange("timeGridDay")}
         className={`bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded ${currentView === 'timeGridDay' ? 'bg-slate-900' : ''}`}

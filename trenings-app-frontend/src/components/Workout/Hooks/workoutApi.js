@@ -98,7 +98,7 @@ const handleSubmit = async (e, client, user, setWorkouts, workoutData, setOpenAd
 };
 
 
-const exportToGoogleCalendar = async (workout,user,setOpenAddWorkoutModal,setExportingWorkout,setWorkoutExported,setWorkoutNotExported) => {
+const exportToGoogleCalendar = async (workout,user,setExportingWorkout,setWorkoutExported,setWorkoutNotExported) => {
 
   if (!user || !user.token) {
     console.error("Bruker er ikke autentisert.");

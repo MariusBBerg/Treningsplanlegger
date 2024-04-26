@@ -13,6 +13,7 @@ import WeeklyRunningVolume from "./WeeklyRunningVolume.js";
 
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { AiOutlineLoading } from "react-icons/ai";
 
 import {
   fetchWorkouts,
@@ -22,6 +23,7 @@ import {
   deleteWorkout,
 } from "./Hooks/workoutApi.js";
 import authorizeGoogleOAuth from "../../services/GoogleServices/authorizeGoogleOAuth.js";
+import { set } from "date-fns";
 
 moment.locale("nb");
 
@@ -44,6 +46,12 @@ const UserWorkoutForm = () => {
   const [exportingWorkout, setExportingWorkout] = useState(false); //for spinner/loader
   const [workoutExported, setWorkoutExported] = useState(false); //for å erstatte knap når ferdig'
   const [workoutNotExported, setWorkoutNotExported] = useState(false); //for å vise feilmelding
+
+  const [exportingWeeklyWorkout, setExportingWeeklyWorkout] = useState(false);
+  const [weeklyWorkoutExported, setWeeklyWorkoutExported] = useState(false);
+  const [weeklyWorkoutNotExported, setWeeklyWorkoutNotExported] =
+    useState(false);
+
   useEffect(() => {
     fetchWorkouts(null, user, setWorkouts);
   }, [user.login]); //ENDRES HVER GANG BRUKER-OBJEKTET
@@ -88,6 +96,28 @@ const UserWorkoutForm = () => {
     setWorkoutExported(false);
     setWorkoutNotExported(false);
   }, [openViewWorkoutModal]);
+
+  useEffect(() => {
+    setExportingWeeklyWorkout(false);
+    setWeeklyWorkoutExported(false);
+    setWeeklyWorkoutNotExported(false);
+  }, [currentWeek]);
+
+  const exportWeekToGoogleCalendar = () => {
+    const weekWorkouts = workouts.filter(
+      (workout) => moment(workout.date).isoWeek() === currentWeek
+    );
+
+    weekWorkouts.forEach((workout) => {
+      exportToGoogleCalendar(
+        workout,
+        user,
+        setExportingWeeklyWorkout,
+        setWeeklyWorkoutExported,
+        setWeeklyWorkoutNotExported
+      );
+    });
+  };
 
   return (
     <div>
@@ -355,7 +385,6 @@ const UserWorkoutForm = () => {
                   exportToGoogleCalendar(
                     selectedWorkout,
                     user,
-                    setOpenAddWorkoutModal,
                     setExportingWorkout,
                     setWorkoutExported,
                     setWorkoutNotExported
@@ -561,11 +590,45 @@ const UserWorkoutForm = () => {
         </Modal.Body>
       </Modal>
 
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          margin: "20px 0",
+        }}
+      >
+        {exportingWeeklyWorkout ? (
+          <Button
+            size="md"
+            isProcessing
+            processingSpinner={
+              <AiOutlineLoading className="h-6 w-6 animate-spin" />
+            }
+          >
+            Export Selected Week to Google Calendar
+          </Button>
+        ) : weeklyWorkoutExported ? (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            Workouts exported successfully!
+          </Alert>
+        ) : weeklyWorkoutNotExported ? (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            Failed to export workouts
+          </Alert>
+        ) : user.isGoogleAuthenticated ? (
+          <Button onClick={() => exportWeekToGoogleCalendar()}>
+            Export Selected Week to Google Calendar
+          </Button>
+        ) : null}
+      </Box>
+
       <WeeklyRunningVolume
         client={user}
         week={currentWeek}
         workouts={workouts}
       />
+
       {user && !user.isGoogleAuthenticated && (
         <Box
           sx={{
