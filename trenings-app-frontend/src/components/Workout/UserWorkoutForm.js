@@ -609,9 +609,7 @@ const UserWorkoutForm = () => {
             Export Selected Week to Google Calendar
           </Button>
         ) : weeklyWorkoutExported ? (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            Workouts exported successfully!
-          </Alert>
+          <Button disabled>Exported</Button>
         ) : weeklyWorkoutNotExported ? (
           <Alert severity="error" sx={{ mb: 2 }}>
             Failed to export workouts
