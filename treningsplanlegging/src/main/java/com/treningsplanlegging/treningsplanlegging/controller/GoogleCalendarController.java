@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.http.BasicAuthentication;
-import com.google.api.client.http.HttpRequest;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.CalendarListEntry;
@@ -33,9 +32,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.http.ResponseEntity;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.http.HttpStatus;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -156,15 +159,25 @@ public class GoogleCalendarController {
     }
 
     @PostMapping("/export-event")
-    public ResponseEntity<?> exportEvent(@RequestBody WorkoutDto eventDto) {
+    public ResponseEntity<?> exportEvent(@RequestBody WorkoutDto eventDto, @RequestParam String userLogin) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String login = authentication.getName();
-        User user = userRepository.findByLogin(login)
+        if(login.toLowerCase().equals(userLogin.toLowerCase())){
+            User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
-        currentUser = user;
+            currentUser = user;
+        }
+        else if(userRepository.findByLogin(userLogin).get().getCoach().getLogin().toLowerCase().equals(login.toLowerCase())){
+            User user = userRepository.findByLogin(userLogin)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + userLogin));
+                currentUser = user;
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not authorized to export event for this user");
+        }
         String accessToken = currentUser.getGoogleAccessToken();
         String refreshToken = currentUser.getGoogleRefreshToken();
 
@@ -298,6 +311,52 @@ public class GoogleCalendarController {
             return ResponseEntity.ok(createdCalendar);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating calendar " + e);
+        }
+    }
+
+    @PostMapping("/revoke")
+    public ResponseEntity<?> revokeGoogleAccess() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String login = authentication.getName();
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
+        currentUser = user;
+    
+        if (currentUser.getGoogleRefreshToken() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User has not granted Google access");
+        }
+    
+        try {
+            // Build revoke URL
+            String revokeUrl = "https://accounts.google.com/o/oauth2/revoke?token=" + currentUser.getGoogleRefreshToken();
+    
+            // Create HTTP client and request
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpGet httpGet = new HttpGet(revokeUrl);
+    
+            // Execute request
+            HttpResponse response = httpClient.execute(httpGet);
+    
+            // Check response status
+            if (response.getStatusLine().getStatusCode() == 200) {
+                // If status is 200 OK, revoke access in the database
+                currentUser.setGoogleRefreshToken(null);
+                currentUser.setGoogleAccessToken(null);
+                currentUser.setIsGoogleAuthenticated(false);
+                currentUser.setCalendarId(null);;
+                currentUser.setAutoExportToGoogleCalendar(false);
+                userService.updateUser(currentUser);
+    
+                return ResponseEntity.ok("Google access revoked");
+            } else {
+                // If status is not 200 OK, return error
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to revoke Google access");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error revoking Google access: " + e);
         }
     }
 

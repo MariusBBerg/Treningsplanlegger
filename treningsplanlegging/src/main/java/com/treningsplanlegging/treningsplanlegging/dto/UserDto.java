@@ -27,6 +27,7 @@ public class UserDto {
     private String refreshToken;
     private String email;
     private Boolean isGoogleAuthenticated;
+    private Boolean autoExportToGoogleCalendar;
 
     private UserDto coach;
     

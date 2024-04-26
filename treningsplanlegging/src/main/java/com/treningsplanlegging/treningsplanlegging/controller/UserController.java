@@ -78,6 +78,7 @@ public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto updatedUse
     currentUser.setEmail(updatedUserDto.getEmail());
     currentUser.setLastName(updatedUserDto.getLastName());
     currentUser.setLogin(updatedUserDto.getLogin());
+    currentUser.setAutoExportToGoogleCalendar(updatedUserDto.getAutoExportToGoogleCalendar());
     // Add any other fields that the user is allowed to update
 
     userRepository.save(currentUser);

@@ -19,9 +19,9 @@ import {
   handleSubmitEdit,
   handleSubmit,
   exportToGoogleCalendar,
+  deleteWorkout,
 } from "./Hooks/workoutApi.js";
-import GoogleAuthButton from "./Hooks/GoogleAuthButton.js";
-import { set } from "date-fns";
+import authorizeGoogleOAuth from "../../services/GoogleServices/authorizeGoogleOAuth.js";
 
 moment.locale("nb");
 
@@ -340,7 +340,7 @@ const UserWorkoutForm = () => {
             Edit
           </Button>
           {exportingWorkout ? (
-            <CircularProgress sx={{ mt: 2 }} />
+            <CircularProgress />
           ) : workoutExported ? (
             <Alert severity="success">Workout exported successfully!</Alert>
           ) : workoutNotExported ? (
@@ -541,6 +541,22 @@ const UserWorkoutForm = () => {
               </div>
               <Button type="submit">Submit Change</Button>
             </form>
+            <Button
+              color="red"
+              onClick={() => {
+                if (selectedWorkout) {
+                  deleteWorkout(
+                    selectedWorkout.id,
+                    null,
+                    user,
+                    setOpenEditWorkoutModal,
+                    setWorkouts
+                  );
+                }
+              }}
+            >
+              Delete Workout
+            </Button>
           </div>
         </Modal.Body>
       </Modal>
@@ -559,7 +575,7 @@ const UserWorkoutForm = () => {
             justifyContent: "center",
           }}
         >
-          <GoogleAuthButton />
+          <Button onClick={() => authorizeGoogleOAuth()}>Google Auth</Button>
         </Box>
       )}
     </div>
