@@ -336,6 +336,7 @@ public class GoogleCalendarController {
                 currentUser.setGoogleRefreshToken(null);
                 currentUser.setGoogleAccessToken(null);
                 currentUser.setIsGoogleAuthenticated(false);
+                currentUser.setCalendarId(null);;
                 userService.updateUser(currentUser);
     
                 return ResponseEntity.ok("Google access revoked");

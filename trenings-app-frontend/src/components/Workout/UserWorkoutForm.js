@@ -339,7 +339,7 @@ const UserWorkoutForm = () => {
             Edit
           </Button>
           {exportingWorkout ? (
-            <CircularProgress sx={{ mt: 2 }} />
+            <CircularProgress/>
           ) : workoutExported ? (
             <Alert severity="success">Workout exported successfully!</Alert>
           ) : workoutNotExported ? (
@@ -558,7 +558,7 @@ const UserWorkoutForm = () => {
             justifyContent: "center",
           }}
         >
-          <Button onclick={authorizeGoogleOAuth()}>Google Auth</Button>
+          <Button onClick={() => authorizeGoogleOAuth()}>Google Auth</Button>
         </Box>
       )}
     </div>

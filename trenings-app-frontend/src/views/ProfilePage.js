@@ -28,7 +28,9 @@ import authorizeGoogleOAuth from "../services/GoogleServices/authorizeGoogleOAut
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
   const userStr = localStorage.getItem("user");
-  const user = userStr ? JSON.parse(userStr) : null;
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("user") || "{}")
+  );
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [email, setEmail] = useState(user.email);
@@ -38,8 +40,13 @@ export default function ProfilePage() {
   const [calendarCreated, setCalendarCreated] = useState(false); //for å erstatte knap når ferdig'
   const [calendarNotCreated, setCalendarNotCreated] = useState(false); //for å vise feilmelding
 
+  const [updated, setUpdated] = useState(false);
   const [updateUserError, setUpdateUserError] = useState("");
 
+  useEffect(() => {
+    // This function runs whenever the component mounts and whenever `user` changes
+    localStorage.setItem("user", JSON.stringify(user));
+  }, [user]);
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     console.log("Form submitted");
@@ -144,6 +151,7 @@ export default function ProfilePage() {
               variant="contained"
               color="primary"
               onClick={() => authorizeGoogleOAuth()}
+              sx = {{mt: 2}}
             >
               Google authorization
             </Button>
@@ -342,7 +350,12 @@ export default function ProfilePage() {
               type="submit"
               variant="contained"
               color="primary"
-              onClick={() => revokeGoogleAccess()}
+              onClick={async () => {
+                await revokeGoogleAccess();
+                // Update user state to trigger re-render
+                const updatedUser = { ...user, isGoogleAuthenticated: false };
+                setUser(updatedUser);
+              }}
             >
               Revoke access to your google account
             </Button>
