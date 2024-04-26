@@ -159,15 +159,25 @@ public class GoogleCalendarController {
     }
 
     @PostMapping("/export-event")
-    public ResponseEntity<?> exportEvent(@RequestBody WorkoutDto eventDto) {
+    public ResponseEntity<?> exportEvent(@RequestBody WorkoutDto eventDto, @RequestParam String userLogin) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String login = authentication.getName();
-        User user = userRepository.findByLogin(login)
+        if(login.toLowerCase().equals(userLogin.toLowerCase())){
+            User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
-        currentUser = user;
+            currentUser = user;
+        }
+        else if(userRepository.findByLogin(userLogin).get().getCoach().getLogin().toLowerCase().equals(login.toLowerCase())){
+            User user = userRepository.findByLogin(userLogin)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + userLogin));
+                currentUser = user;
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not authorized to export event for this user");
+        }
         String accessToken = currentUser.getGoogleAccessToken();
         String refreshToken = currentUser.getGoogleRefreshToken();
 
@@ -337,6 +347,7 @@ public class GoogleCalendarController {
                 currentUser.setGoogleAccessToken(null);
                 currentUser.setIsGoogleAuthenticated(false);
                 currentUser.setCalendarId(null);;
+                currentUser.setAutoExportToGoogleCalendar(false);
                 userService.updateUser(currentUser);
     
                 return ResponseEntity.ok("Google access revoked");

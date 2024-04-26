@@ -115,4 +115,29 @@ public class WorkoutController {
 
     }
 
+    @DeleteMapping("/{id}")
+public ResponseEntity<?> deleteWorkout(@PathVariable Long id, @RequestParam String clientLogin) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || !authentication.isAuthenticated()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    String login = authentication.getName();
+    User user = userRepository.findByLogin(login)
+            .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
+    User client = userRepository.findByLogin(clientLogin)
+            .orElseThrow(() -> new RuntimeException("User not found with username: " + clientLogin));
+
+    if (!user.equals(client.getCoach()) && !user.equals(client)) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    Workout workout = workoutService.findById(id);
+    if (workout == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    workoutService.deleteWorkout(id);
+    return ResponseEntity.ok().build();
+}
+
 }

@@ -42,6 +42,8 @@ public class User {
     
     private Boolean isGoogleAuthenticated;
 
+    private Boolean autoExportToGoogleCalendar;
+
     private String CalendarId;
 
     @ManyToOne

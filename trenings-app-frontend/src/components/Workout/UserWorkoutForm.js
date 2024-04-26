@@ -19,6 +19,7 @@ import {
   handleSubmitEdit,
   handleSubmit,
   exportToGoogleCalendar,
+  deleteWorkout,
 } from "./Hooks/workoutApi.js";
 import authorizeGoogleOAuth from "../../services/GoogleServices/authorizeGoogleOAuth.js";
 
@@ -339,7 +340,7 @@ const UserWorkoutForm = () => {
             Edit
           </Button>
           {exportingWorkout ? (
-            <CircularProgress/>
+            <CircularProgress />
           ) : workoutExported ? (
             <Alert severity="success">Workout exported successfully!</Alert>
           ) : workoutNotExported ? (
@@ -540,6 +541,22 @@ const UserWorkoutForm = () => {
               </div>
               <Button type="submit">Submit Change</Button>
             </form>
+            <Button
+              color="red"
+              onClick={() => {
+                if (selectedWorkout) {
+                  deleteWorkout(
+                    selectedWorkout.id,
+                    null,
+                    user,
+                    setOpenEditWorkoutModal,
+                    setWorkouts
+                  );
+                }
+              }}
+            >
+              Delete Workout
+            </Button>
           </div>
         </Modal.Body>
       </Modal>

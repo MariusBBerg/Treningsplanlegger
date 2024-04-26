@@ -43,4 +43,7 @@ public class WorkoutService {
     public Workout findById(Long id) {
         return workoutRepository.findById(id).orElseThrow(() -> new RuntimeException("Workout not found with id: " + id));
     }
+    public void deleteWorkout(Long id) {
+        workoutRepository.deleteById(id);
+    }
 }

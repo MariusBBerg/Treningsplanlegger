@@ -9,6 +9,7 @@ import {
   fetchWorkouts,
   handleSubmitEdit,
   handleSubmit,
+  deleteWorkout,
 } from "./Hooks/workoutApi.js";
 
 import FullCalendarComponent from "./FullCalendarComponent.js";
@@ -521,6 +522,22 @@ const ClientWorkoutForm = () => {
               </div>
               <Button type="submit">Submit Change</Button>
             </form>
+            <Button
+              color="red"
+              onClick={() => {
+                if (selectedWorkout) {
+                  deleteWorkout(
+                    selectedWorkout.id,
+                    client,
+                    user,
+                    setOpenEditWorkoutModal,
+                    setWorkouts
+                  );
+                }
+              }}
+            >
+              Delete Workout
+            </Button>
           </div>
         </Modal.Body>
       </Modal>

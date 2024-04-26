@@ -17,6 +17,8 @@ import Footer from "../components/Footer";
 import { API_URL } from "../utils/api_url";
 
 import CircularProgress from "@mui/material/CircularProgress";
+import Switch from "@mui/material/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
@@ -39,14 +41,35 @@ export default function ProfilePage() {
   const [creatingCalendar, setCreatingCalendar] = useState(false); //for spinner/loader
   const [calendarCreated, setCalendarCreated] = useState(false); //for å erstatte knap når ferdig'
   const [calendarNotCreated, setCalendarNotCreated] = useState(false); //for å vise feilmelding
-
-  const [updated, setUpdated] = useState(false);
   const [updateUserError, setUpdateUserError] = useState("");
 
+  const [autoExport, setAutoExport] = useState(
+    user.autoExportToGoogleCalendar || false
+  );
+
   useEffect(() => {
-    // This function runs whenever the component mounts and whenever `user` changes
     localStorage.setItem("user", JSON.stringify(user));
   }, [user]);
+
+  const handleAutoExportChange = async (event) => {
+    setAutoExport(event.target.checked);
+    const updatedUser = {
+      ...user,
+      autoExportToGoogleCalendar: event.target.checked,
+    };
+    setUser(updatedUser);
+    try {
+      const response = await axios.put(API_URL + "api/users/me", updatedUser, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      if (response.data.token) {
+        localStorage.setItem("user", JSON.stringify(response.data));
+      }
+    } catch (error) {
+      console.error("Error updating user", error);
+    }
+  };
+
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     console.log("Form submitted");
@@ -55,6 +78,7 @@ export default function ProfilePage() {
       lastName,
       email,
       login,
+      autoExport,
     };
     try {
       const response = await axios.put(API_URL + "api/users/me", userData, {
@@ -151,7 +175,7 @@ export default function ProfilePage() {
               variant="contained"
               color="primary"
               onClick={() => authorizeGoogleOAuth()}
-              sx = {{mt: 2}}
+              sx={{ mt: 2 }}
             >
               Google authorization
             </Button>
@@ -263,9 +287,8 @@ export default function ProfilePage() {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 400,
-            height: 500,
             bgcolor: "background.paper",
-            boxShadow: 0,
+            boxShadow: 24,
             p: 4,
             borderRadius: 2,
             display: "flex",
@@ -290,15 +313,15 @@ export default function ProfilePage() {
             id="google-config-modal-title"
             variant="h6"
             component="h2"
-            sx={{ alignSelf: "middle" }} // Align title to the start
+            sx={{ alignSelf: "start", mb: 2 }} // Align title to the start
           >
             Google Calendar Configuration
           </Typography>
 
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
             More to come soon
           </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
             {user.isGoogleAuthenticated ? (
               <>
                 <CheckCircleIcon color="success" />
@@ -315,24 +338,22 @@ export default function ProfilePage() {
               </>
             )}
           </Box>
-
-          {creatingCalendar ? (
-            <CircularProgress />
-          ) : calendarCreated ? (
-            <Alert severity="success">Calendar created successfully!</Alert>
-          ) : calendarNotCreated ? (
-            <Alert severity="error">Failed to create calendar</Alert>
-          ) : (
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              onClick={() => handleCreateCalendar()}
-            >
-              Create A new Calendar
-            </Button>
+          {user.isGoogleAuthenticated && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={autoExport}
+                  onChange={handleAutoExportChange}
+                  name="autoExport"
+                  color="primary"
+                />
+              }
+              label="Auto export future sessions to Google Calendar"
+              sx={{ mb: 2 }}
+            />
           )}
-          <Typography variant="body1" sx={{ textAlign: "center" }}>
+
+          <Typography variant="body1" sx={{ textAlign: "center", mb: 2 }}>
             Reconnect your account to google, or to another google account
           </Typography>
 
@@ -360,6 +381,27 @@ export default function ProfilePage() {
               Revoke access to your google account
             </Button>
           )}
+          {creatingCalendar ? (
+            <CircularProgress sx={{ mb: 2 }} />
+          ) : calendarCreated ? (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              Calendar created successfully!
+            </Alert>
+          ) : calendarNotCreated ? (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              Failed to create calendar
+            </Alert>
+          ) : user.isGoogleAuthenticated ? (
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              onClick={() => handleCreateCalendar()}
+              sx={{ mb: 2 }}
+            >
+              Create A new Calendar
+            </Button>
+          ) : null}
         </Box>
       </Modal>
       <Snackbar
