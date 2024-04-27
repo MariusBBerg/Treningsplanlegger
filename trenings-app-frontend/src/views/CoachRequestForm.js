@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -13,13 +13,12 @@ import CardActions from "@mui/material/CardActions";
 import { API_URL } from "../utils/api_url";
 import Navigation from "../components/Navigation/Navigation"; // Sørg for at denne linjen er korrekt importert
 import Footer from "../components/Footer";
-import { usePageVisibility } from "./Hooks/usePageVisibility"; 
+import { usePageVisibility } from "./Hooks/usePageVisibility";
 
 const CoachRequestForm = () => {
   const isPageVisible = usePageVisibility(); //om bruker er inne på siden eller ikke
   const timerIdRef = useRef(null);
   const [isPollingEnabled, setIsPollingEnabled] = useState(true);
-
 
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState([]);
@@ -36,17 +35,14 @@ const CoachRequestForm = () => {
 
   const searchUsers = async (searchTerm) => {
     try {
-      const response = await axios.get(
-        API_URL + `api/users/search`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-          params: {
-            query: searchTerm,
-          },
-        }
-      );
+      const response = await axios.get(API_URL + `api/users/search`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+        params: {
+          query: searchTerm,
+        },
+      });
       setUsers(response.data);
     } catch (error) {
       console.error("Error searching users", error);
@@ -71,6 +67,7 @@ const CoachRequestForm = () => {
           },
         }
       );
+      console.log(response.data);
       setRequests(response.data);
     } catch (error) {
       console.error("Error fetching requests", error);
@@ -113,24 +110,20 @@ const CoachRequestForm = () => {
     }
   };
 
-
-
   //Short-polling, sjekker om bruker har fanen aktiv eller ikke, hvis aktiv: polling hvert 30 sekund
   useEffect(() => {
     const pollingCallback = () => {
       try {
         fetchRequests();
       } catch (error) {
-
-      if (error) {
-        setIsPollingEnabled(false);
-        console.log('Polling failed. Stopped polling.');
+        if (error) {
+          setIsPollingEnabled(false);
+          console.log("Polling failed. Stopped polling.");
+        }
       }
-    };
     };
 
     const startPolling = () => {
-
       timerIdRef.current = setInterval(pollingCallback, 30000);
     };
 
@@ -150,62 +143,61 @@ const CoachRequestForm = () => {
   }, [isPageVisible, isPollingEnabled]);
 
   return (
-    <div className="theme-bg min-h-screen flex flex-col justify-between"> {/* For å få footer til å bli nederst */}
-    <Container sx={{ mt: 15 }}>
-      <Navigation />
-      <Typography variant="h4" component="h1" gutterBottom>
-        Coach Requests
-      </Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <Card sx={{ p: 2, height: "100%" }}>
-            <Typography variant="h5" component="h2" gutterBottom>
-              Find your coach
-            </Typography>
-            <TextField
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              label="Search users"
-              variant="outlined"
-              fullWidth
-            />
-            {users.map((user) => (
-              <Card key={user.id} sx={{ mb: 2 }}>
-                <CardContent>
-                  <Typography variant="h6" component="h2">
-                    {user.firstName}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => sendRequest(user.id)}
-                  >
-                    Send Request
-                  </Button>
-                </CardActions>
-              </Card>
-            ))}
-          </Card>
-        </Grid>
-        
+    <div className="theme-bg min-h-screen flex flex-col justify-between">
+      <Container sx={{ mt: 15 }}>
+        <Navigation />
+        <Typography variant="h4" component="h1" gutterBottom>
+          Coach Requests
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <Card sx={{ p: 2, height: "100%" }}>
+              <Typography variant="h5" component="h2" gutterBottom>
+                Find your coach
+              </Typography>
+              <TextField
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                label="Search users"
+                variant="outlined"
+                fullWidth
+              />
+              {users.map((user) => (
+                <Card key={user.id} sx={{ mb: 2 }}>
+                  <CardContent>
+                    <Typography variant="h6" component="h2">
+                      {user.firstName}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => sendRequest(user.id)}
+                    >
+                      Send Request
+                    </Button>
+                  </CardActions>
+                </Card>
+              ))}
+            </Card>
+          </Grid>
+
           <Grid item xs={12} sm={6}>
             <Card sx={{ p: 2, height: "100%" }}>
               <Typography variant="h5" component="h2" gutterBottom>
                 Requests
               </Typography>
               {requests.length < 1 && (
-
-                <Typography variant="h6"  gutterBottom>
-                    You have no requests
+                <Typography variant="h6" gutterBottom>
+                  You have no requests
                 </Typography>
-                )}
+              )}
               {requests.map((request) => (
                 <Card key={request.id} sx={{ mb: 2 }}>
                   <CardContent>
-                    <Typography >
-                      {request.requester.firstName} wants you to coach him.
+                    <Typography>
+                      {request.requester.firstName} {request.requester.lastName} wants you to coach him.
                     </Typography>
                   </CardContent>
                   <CardActions>
@@ -228,36 +220,35 @@ const CoachRequestForm = () => {
               ))}
             </Card>
           </Grid>
-        
-      </Grid>
-      <Snackbar
-        open={open}
-        autoHideDuration={6000}
-        onClose={() => setOpen(false)}
-      >
-        <Alert
+        </Grid>
+        <Snackbar
+          open={open}
+          autoHideDuration={6000}
           onClose={() => setOpen(false)}
-          severity="success"
-          sx={{ width: "100%" }}
         >
-          Request sent successfully
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={!!errorMessage}
-        autoHideDuration={6000}
-        onClose={() => setErrorMessage("")}
-      >
-        <Alert
+          <Alert
+            onClose={() => setOpen(false)}
+            severity="success"
+            sx={{ width: "100%" }}
+          >
+            Request sent successfully
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={!!errorMessage}
+          autoHideDuration={6000}
           onClose={() => setErrorMessage("")}
-          severity="error"
-          sx={{ width: "100%" }}
         >
-          {errorMessage}
-        </Alert>
-      </Snackbar>
-    </Container>
-          <Footer />
+          <Alert
+            onClose={() => setErrorMessage("")}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {errorMessage}
+          </Alert>
+        </Snackbar>
+      </Container>
+      <Footer />
     </div>
   );
 };

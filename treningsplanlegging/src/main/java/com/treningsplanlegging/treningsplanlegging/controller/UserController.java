@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<User>> searchUsers(@RequestParam String query) {
+    public ResponseEntity<List<UserDto>> searchUsers(@RequestParam String query) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String login = authentication.getName();
         User currentUser = userRepository.findByLogin(login)
@@ -49,8 +49,12 @@ public class UserController {
         users = users.stream()
                 .filter(user -> !user.getId().equals(currentUser.getId()))
                 .collect(Collectors.toList());
+        
+        List<UserDto> userDtos = users.stream()
+                .map(userMapper::toUserDto)
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(userDtos);
     }
 
     

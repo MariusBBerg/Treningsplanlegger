@@ -26,6 +26,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import revokeGoogleAccess from "../services/GoogleServices/revokeGoogleAccess";
 import authorizeGoogleOAuth from "../services/GoogleServices/authorizeGoogleOAuth";
+import FriendRequests from "./Socials/FriendsView";
+import FriendsModal from "../components/FriendsModal";
 
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
@@ -42,6 +44,7 @@ export default function ProfilePage() {
   const [calendarCreated, setCalendarCreated] = useState(false); //for å erstatte knap når ferdig'
   const [calendarNotCreated, setCalendarNotCreated] = useState(false); //for å vise feilmelding
   const [updateUserError, setUpdateUserError] = useState("");
+  const [friendsModalOpen, setFriendsModalOpen] = useState(false);
 
   const [autoExport, setAutoExport] = useState(
     user.autoExportToGoogleCalendar || false
@@ -138,6 +141,10 @@ export default function ProfilePage() {
     }
   };
 
+
+
+  
+
   return (
     <div className="theme-bg min-h-screen flex flex-col justify-between">
       <Navigation />
@@ -180,8 +187,22 @@ export default function ProfilePage() {
               Google authorization
             </Button>
           )}
+                  <Button
+          variant="contained"
+          color="primary"
+          sx={{ mt: 2 }}
+          onClick={() => setFriendsModalOpen(true)}
+        >
+          Manage Friends
+        </Button>
         </Box>
+        
+
       </Container>
+
+
+
+      
       <Modal
         open={open}
         onClose={() => setOpen(false)}
@@ -404,6 +425,13 @@ export default function ProfilePage() {
           ) : null}
         </Box>
       </Modal>
+
+      <FriendsModal
+        open={friendsModalOpen}
+        onClose={() => setFriendsModalOpen(false)}
+        user={user}
+      />
+
       <Snackbar
         open={!!updateUserError}
         autoHideDuration={4000}
@@ -418,6 +446,7 @@ export default function ProfilePage() {
         </Alert>
       </Snackbar>
       <Footer />
+
     </div>
   );
 }

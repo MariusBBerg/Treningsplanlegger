@@ -51,9 +51,12 @@ public class FriendRequestService {
             throw new IllegalStateException("You cannot send a request to yourself");
         }
         FriendRequest existingRequest = friendRequestRepository.findBySenderAndReceiver(sender, receiver);
-        if (existingRequest != null) {
+        FriendRequest existingRequest2 = friendRequestRepository.findBySenderAndReceiver(receiver, sender);
+        if (existingRequest != null || existingRequest2 != null) {
             throw new IllegalStateException("A pending request already exists");
         }
+
+
         FriendRequest request = new FriendRequest();
         request.setSender(sender);
         request.setReceiver(receiver);

@@ -27,7 +27,9 @@ const navigation = [
 const loggedInNavigation = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Profile", href: "/profile" },
+  {name: "Friends", href: "/friends"},
   { name: "Coach", href: "/coach" },
+
 ];
 
 export default function Navigation() {
