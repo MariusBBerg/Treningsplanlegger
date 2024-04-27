@@ -1,5 +1,8 @@
 package com.treningsplanlegging.treningsplanlegging.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -11,8 +14,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.treningsplanlegging.treningsplanlegging.dto.FriendRequestDto;
+import com.treningsplanlegging.treningsplanlegging.dto.UserDto;
 import com.treningsplanlegging.treningsplanlegging.entity.FriendRequest;
 import com.treningsplanlegging.treningsplanlegging.entity.User;
+import com.treningsplanlegging.treningsplanlegging.mappers.UserMapper;
 import com.treningsplanlegging.treningsplanlegging.repository.FriendRequestRepository;
 import com.treningsplanlegging.treningsplanlegging.repository.UserRepository;
 import com.treningsplanlegging.treningsplanlegging.service.FriendRequestService;
@@ -24,12 +30,14 @@ public class FriendRequestController {
     private final UserRepository userRepository;
     private final FriendRequestRepository friendRequestRepository;
     private final FriendRequestService friendRequestService;
+    private final UserMapper userMapper;
 
     public FriendRequestController(FriendRequestService friendRequestService, UserRepository userRepository,
-            FriendRequestRepository friendRequestRepository) {
+            FriendRequestRepository friendRequestRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.friendRequestRepository = friendRequestRepository;
         this.friendRequestService = friendRequestService;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/{receiverId}")
@@ -103,6 +111,15 @@ public class FriendRequestController {
         User receiver = userRepository.findByLogin(login)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
 
-        return ResponseEntity.ok(friendRequestRepository.findByReceiverAndStatus(receiver, "PENDING"));
+        List<FriendRequest> friendRequests = friendRequestRepository.findByReceiverAndStatus(receiver, "PENDING");
+        List<FriendRequestDto> friendRequestDtos = friendRequests.stream()
+    .map(friendRequest -> new FriendRequestDto(
+        friendRequest.getId(),
+        userMapper.toUserDto(friendRequest.getSender()),
+        userMapper.toUserDto(friendRequest.getReceiver()),
+        friendRequest.getStatus()))
+    .collect(Collectors.toList());
+
+        return ResponseEntity.ok(friendRequestDtos);
     }
 }

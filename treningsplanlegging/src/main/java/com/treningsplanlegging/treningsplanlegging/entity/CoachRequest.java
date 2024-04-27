@@ -1,5 +1,7 @@
 package com.treningsplanlegging.treningsplanlegging.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,9 +21,11 @@ public class CoachRequest {
     private Long id;
 
     @ManyToOne
+    @JsonBackReference
     private User requester;
 
     @ManyToOne
+    @JsonBackReference
     private User requested;
 
     private String status; // Can be "PENDING", "ACCEPTED", or "REJECTED"

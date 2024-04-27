@@ -1,7 +1,10 @@
 package com.treningsplanlegging.treningsplanlegging.controller;
 
+import com.treningsplanlegging.treningsplanlegging.dto.CoachRequestDto;
+import com.treningsplanlegging.treningsplanlegging.dto.FriendRequestDto;
 import com.treningsplanlegging.treningsplanlegging.entity.CoachRequest;
 import com.treningsplanlegging.treningsplanlegging.entity.User;
+import com.treningsplanlegging.treningsplanlegging.mappers.UserMapper;
 import com.treningsplanlegging.treningsplanlegging.repository.UserRepository;
 import com.treningsplanlegging.treningsplanlegging.service.CoachRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/coach-requests")
@@ -20,11 +24,13 @@ public class CoachRequestController {
 
     private final CoachRequestService coachRequestService;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Autowired
-    public CoachRequestController(CoachRequestService coachRequestService, UserRepository userRepository) {
+    public CoachRequestController(CoachRequestService coachRequestService, UserRepository userRepository, UserMapper userMapper) {
         this.coachRequestService = coachRequestService;
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/user/{requesterId}/request/{requestedId}")
@@ -61,7 +67,7 @@ public class CoachRequestController {
     }
 
     @GetMapping("/user/{userId}/requests")
-    public ResponseEntity<List<CoachRequest>> getPendingRequests(@PathVariable Long userId) {
+    public ResponseEntity<List<CoachRequestDto>> getPendingRequests(@PathVariable Long userId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -73,7 +79,14 @@ public class CoachRequestController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         List<CoachRequest> requests = coachRequestService.getPendingRequests(userId);
-        System.out.println("testerr" + requests);
-        return ResponseEntity.ok(requests);
+
+        List<CoachRequestDto> coachRequestDtos = requests.stream()
+    .map(coachRequest -> new CoachRequestDto(
+        coachRequest.getId(),
+        userMapper.toUserDto(coachRequest.getRequester()),
+        userMapper.toUserDto(coachRequest.getRequested()),
+        coachRequest.getStatus()))
+    .collect(Collectors.toList());
+        return ResponseEntity.ok(coachRequestDtos);
     }
 }
