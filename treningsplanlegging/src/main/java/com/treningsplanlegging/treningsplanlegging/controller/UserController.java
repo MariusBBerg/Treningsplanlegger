@@ -93,7 +93,52 @@ public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto updatedUse
     // Return the object with the new token
     return ResponseEntity.ok(updatedUser);
 }
-
+    @GetMapping("/me/friends")
+    public ResponseEntity<List<UserDto>> getCurrentUserFriends() {
+        // Get the current user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String login = authentication.getName();
+        User currentUser = userRepository.findByLogin(login)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
+    
+        // Get the friends of the current user
+        List<User> friends = currentUser.getFriends();
+    
+        // Convert the friends to DTOs
+        List<UserDto> friendDtos = friends.stream()
+            .map(userMapper::toUserDto)
+            .collect(Collectors.toList());
+    
+        return ResponseEntity.ok(friendDtos);
+    }
+    @DeleteMapping("/me/friends/{friendId}")
+    public ResponseEntity<?> removeFriend(@PathVariable Long friendId) {
+        // Get the current user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String login = authentication.getName();
+        User currentUser = userRepository.findByLogin(login)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
+    
+        // Get the friend to remove
+        User friend = userRepository.findById(friendId)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + friendId));
+    
+        // Remove the friend from the current user's friend list and vice versa
+        currentUser.getFriends().remove(friend);
+        friend.getFriends().remove(currentUser);
+    
+        // Save the users
+        userRepository.save(currentUser);
+        userRepository.save(friend);
+    
+        return ResponseEntity.ok().build();
+    }
 
     @DeleteMapping("/clients/{clientId}")
     public ResponseEntity<Void> deleteClient(@PathVariable Long clientId) {
