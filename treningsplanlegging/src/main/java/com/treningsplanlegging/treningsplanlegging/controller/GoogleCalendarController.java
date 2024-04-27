@@ -212,7 +212,7 @@ public class GoogleCalendarController {
             event.setStart(new EventDateTime().setDateTime(new DateTime(startDate)));
 
             Date endDate;
-            if ("Løping".equals(eventDto.getType())) {
+            if ("Running".equals(eventDto.getType())) {
                 // For løpetur, legg til distanse i beskrivelsen og sett varigheten til den
                 // gitte varigheten i sekunder
                 String description = "Distance: " + eventDto.getDistance() + "km" + "\n" + "Intensity Zone: "

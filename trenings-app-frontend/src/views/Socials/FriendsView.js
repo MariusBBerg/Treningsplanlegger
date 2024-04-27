@@ -60,6 +60,7 @@ const FriendsView = () => {
     }
   };
 
+
   useEffect(() => {
     if (searchTerm) {
       searchUsers(searchTerm);
@@ -215,9 +216,9 @@ const FriendsView = () => {
   };
 
   return (
-    <div className="theme-bg min-h-screen flex flex-col justify-between">
+    <div className="theme-bg min-h-screen flex flex-col">
       <Navigation />
-      <Container sx={{ mt: 10, mb: 3 }}>
+      <Container sx={{ mt: 10, mb: 3 , flex:1}}>
         <Grid container spacing={2}>
           <Grid
             item

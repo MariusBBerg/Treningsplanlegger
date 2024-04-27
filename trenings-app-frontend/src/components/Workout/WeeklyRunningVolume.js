@@ -29,7 +29,7 @@ const WeeklyRunningVolume = ({ client, week,workouts }) => {
       .filter(workout => {
         const workoutDate = moment(workout.date);
         return (
-          workout.type === 'Løping' &&
+          workout.type === 'Running' &&
           workoutDate.isBetween(startOfWeek, endOfWeek, null, '[]')
         );
       })

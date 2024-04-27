@@ -19,7 +19,7 @@ const LoginForm = ({ onSwitchForm }) => {
     e.preventDefault();
     authService.login(login, password).then(
       () => {
-        navigate("/dashboard");
+        navigate("/home");
         setLoggedIn(true);
       },
       (error) => {
@@ -33,7 +33,7 @@ const LoginForm = ({ onSwitchForm }) => {
   };
 
   return (
-    <div>
+    <div className="theme-bg min-h-screen flex flex-col">
       <Navigation />
       <Card variant="outlined" sx={{ maxWidth: 400, margin: "auto", marginTop: 20, padding: 3 }}>
         <Typography variant="h5" align="center" gutterBottom>

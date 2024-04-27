@@ -17,6 +17,7 @@ import checkAuth from "./views/Hooks/checkAuth.js";
 import OAuthCallback from "./components/Workout/Hooks/OAuthCallback.js";
 import PrivacyPolicy from "./views/PrivacyPolicy.js";
 import FriendsView from "./views/Socials/FriendsView.js";
+import HomeFeed from "./views/HomeFeed.js";
 
 
 function App() {
@@ -33,7 +34,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<PublicRoute><HomePage /></PublicRoute>} />
 
           <Route path="/login" element={
             <PublicRoute>
@@ -47,6 +48,8 @@ function App() {
               <RegisterForm />
             </PublicRoute>
             } />
+
+          <Route path="/home" element={<ProtectedRoute><HomeFeed  /></ProtectedRoute>} />
 
           <Route
             path="/dashboard"
