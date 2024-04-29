@@ -8,7 +8,6 @@ import {
   Container,
   Box,
   IconButton,
-  Tooltip,
   CircularProgress,
 } from "@mui/material";
 import { fetchWorkouts } from "../components/Workout/Hooks/workoutApi";
@@ -16,7 +15,9 @@ import { API_URL } from "../utils/api_url";
 import Navigation from "../components/Navigation/Navigation";
 import Footer from "../components/Footer";
 import moment from "moment";
-import { Refresh, RunCircle } from "@mui/icons-material";
+import { Refresh, RunCircle,FitnessCenter } from "@mui/icons-material";
+import MonitorHeartOutlinedIcon from '@mui/icons-material/MonitorHeartOutlined';
+
 
 const HomeFeed = () => {
   const [myWorkouts, setMyWorkouts] = useState([]);
@@ -80,6 +81,7 @@ const HomeFeed = () => {
                 </Typography>
                 {myWorkouts
                   .filter((workout) => new Date(workout.date) > new Date())
+                  .sort((a, b) => new Date(a.date) - new Date(b.date))
                   .slice(0, 7)
                   .map((workout) => (
                     <Card
@@ -98,7 +100,7 @@ const HomeFeed = () => {
                         >
                           <Typography variant="h6">{workout.name}</Typography>
                           <Typography variant="body1">
-                            <RunCircle /> {workout.type}
+                          {workout.type === 'Strength' ? <FitnessCenter /> : workout.type === 'Cardio' ? <MonitorHeartOutlinedIcon /> : <RunCircle />} {workout.type}
                           </Typography>
                           <Typography variant="body2">
                             {workout.description || "No description provided"}
@@ -145,7 +147,7 @@ const HomeFeed = () => {
                           {workout.name} - {workout.userLogin}
                         </Typography>
                         <Typography variant="body1">
-                          <RunCircle /> {workout.type}
+                        {workout.type === 'Strength' ? <FitnessCenter /> : workout.type === 'Cardio' ? <MonitorHeartOutlinedIcon /> : <RunCircle />} {workout.type}
                         </Typography>
                         <Typography variant="body2">
                           Date:{" "}
