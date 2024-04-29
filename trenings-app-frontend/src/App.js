@@ -16,6 +16,8 @@ import ClientDashboard from "./views/ClientDashboard.js";
 import checkAuth from "./views/Hooks/checkAuth.js";
 import OAuthCallback from "./components/Workout/Hooks/OAuthCallback.js";
 import PrivacyPolicy from "./views/PrivacyPolicy.js";
+import FriendsView from "./views/Socials/FriendsView.js";
+import HomeFeed from "./views/HomeFeed.js";
 
 
 function App() {
@@ -32,7 +34,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<PublicRoute><HomePage /></PublicRoute>} />
 
           <Route path="/login" element={
             <PublicRoute>
@@ -46,6 +48,8 @@ function App() {
               <RegisterForm />
             </PublicRoute>
             } />
+
+          <Route path="/home" element={<ProtectedRoute><HomeFeed  /></ProtectedRoute>} />
 
           <Route
             path="/dashboard"
@@ -61,6 +65,7 @@ function App() {
           <Route path="/client-dashboard" element={<ProtectedRoute><ClientDashboard /></ProtectedRoute>} />
 
           <Route path="/profile" element={<ProtectedRoute><ProfilePage  /></ProtectedRoute>} />
+          <Route path="/friends" element={<ProtectedRoute><FriendsView /></ProtectedRoute>} />
           <Route path="/logout" element={<Logout />} />
           <Route path="/googlecalendar/callback" element={<OAuthCallback />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />

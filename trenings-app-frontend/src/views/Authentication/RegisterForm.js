@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import authService from "../../services/authService";
 import { Button, TextField, Card, Typography, Grid } from "@mui/material"; // Importerer Material-UI-komponenter
 import Navigation from '../../components/Navigation/Navigation';
+import Footer from "../../components/Footer";
 
 const RegisterForm = () => {
   const [login, setLogin] = useState("");
@@ -25,7 +26,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <div>
+    <div className="theme-bg min-h-screen flex flex-col">
       <Navigation />
       <Card
         variant="outlined"
@@ -97,6 +98,7 @@ const RegisterForm = () => {
           </Typography>
         </Grid>
       </Card>
+      <Footer />
     </div>
   );
 };

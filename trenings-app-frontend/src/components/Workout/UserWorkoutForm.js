@@ -13,6 +13,7 @@ import WeeklyRunningVolume from "./WeeklyRunningVolume.js";
 
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { AiOutlineLoading } from "react-icons/ai";
 
 import {
   fetchWorkouts,
@@ -44,6 +45,12 @@ const UserWorkoutForm = () => {
   const [exportingWorkout, setExportingWorkout] = useState(false); //for spinner/loader
   const [workoutExported, setWorkoutExported] = useState(false); //for å erstatte knap når ferdig'
   const [workoutNotExported, setWorkoutNotExported] = useState(false); //for å vise feilmelding
+
+  const [exportingWeeklyWorkout, setExportingWeeklyWorkout] = useState(false);
+  const [weeklyWorkoutExported, setWeeklyWorkoutExported] = useState(false);
+  const [weeklyWorkoutNotExported, setWeeklyWorkoutNotExported] =
+    useState(false);
+
   useEffect(() => {
     fetchWorkouts(null, user, setWorkouts);
   }, [user.login]); //ENDRES HVER GANG BRUKER-OBJEKTET
@@ -89,6 +96,28 @@ const UserWorkoutForm = () => {
     setWorkoutNotExported(false);
   }, [openViewWorkoutModal]);
 
+  useEffect(() => {
+    setExportingWeeklyWorkout(false);
+    setWeeklyWorkoutExported(false);
+    setWeeklyWorkoutNotExported(false);
+  }, [currentWeek]);
+
+  const exportWeekToGoogleCalendar = () => {
+    const weekWorkouts = workouts.filter(
+      (workout) => moment(workout.date).isoWeek() === currentWeek
+    );
+
+    weekWorkouts.forEach((workout) => {
+      exportToGoogleCalendar(
+        workout,
+        user,
+        setExportingWeeklyWorkout,
+        setWeeklyWorkoutExported,
+        setWeeklyWorkoutNotExported
+      );
+    });
+  };
+
   return (
     <div>
       <label htmlFor="date">Date:</label>
@@ -114,7 +143,7 @@ const UserWorkoutForm = () => {
                 e.preventDefault();
 
                 const durationInSeconds =
-                  type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
+                  type === "Running" ? parseInt(duration, 10) * 60 : undefined;
 
                 const dateTime = moment(
                   `${date} ${time}`,
@@ -127,10 +156,10 @@ const UserWorkoutForm = () => {
                   description,
                   type,
                   distance:
-                    type === "Løping" ? parseFloat(distance) : undefined,
+                    type === "Running" ? parseFloat(distance) : undefined,
                   durationSeconds: durationInSeconds,
                   intensityZone:
-                    type === "Løping" ? parseInt(zone, 10) : undefined,
+                    type === "Running" ? parseInt(zone, 10) : undefined,
                 };
 
                 handleSubmit(
@@ -155,7 +184,7 @@ const UserWorkoutForm = () => {
                   onChange={(e) => setType(e.target.value)}
                 >
                   <option value="">Choose a type</option>
-                  <option value="Løping">Running</option>
+                  <option value="Running">Running</option>
                   <option value="Styrke">Strength</option>
                   <option value="Cardio">General Cardio</option>
                 </Select>
@@ -176,7 +205,7 @@ const UserWorkoutForm = () => {
                   />
                 </div>
               </div>
-              {type === "Løping" && (
+              {type === "Running" && (
                 <>
                   <div className="max-w-sm py-2">
                     <label
@@ -309,7 +338,7 @@ const UserWorkoutForm = () => {
                 <p className="text-sm text-gray-900 dark:text-white">
                   Type: {selectedWorkout.type}
                 </p>
-                {selectedWorkout.type === "Løping" && (
+                {selectedWorkout.type === "Running" && (
                   <>
                     <p className="text-sm text-gray-900 dark:text-white">
                       Duration: {selectedWorkout.duration} minutes
@@ -355,7 +384,6 @@ const UserWorkoutForm = () => {
                   exportToGoogleCalendar(
                     selectedWorkout,
                     user,
-                    setOpenAddWorkoutModal,
                     setExportingWorkout,
                     setWorkoutExported,
                     setWorkoutNotExported
@@ -380,7 +408,7 @@ const UserWorkoutForm = () => {
               onSubmit={(e) => {
                 e.preventDefault();
                 const durationInSeconds =
-                  type === "Løping" ? parseInt(duration, 10) * 60 : undefined;
+                  type === "Running" ? parseInt(duration, 10) * 60 : undefined;
 
                 const dateTime = moment(
                   `${date} ${time}`,
@@ -393,10 +421,10 @@ const UserWorkoutForm = () => {
                   description,
                   type,
                   distance:
-                    type === "Løping" ? parseFloat(distance) : undefined,
+                    type === "Running" ? parseFloat(distance) : undefined,
                   durationSeconds: durationInSeconds, // Bruk den konverterte varigheten i sekunder
                   intensityZone:
-                    type === "Løping" ? parseInt(zone, 10) : undefined,
+                    type === "Running" ? parseInt(zone, 10) : undefined,
                 };
                 handleSubmitEdit(
                   e,
@@ -420,7 +448,7 @@ const UserWorkoutForm = () => {
                   onChange={(e) => setType(e.target.value)}
                 >
                   <option value="">Choose a type</option>
-                  <option value="Løping">Running</option>
+                  <option value="Running">Running</option>
                   <option value="Styrke">Strength</option>
                   <option value="Cardio">General Cardio</option>
                 </Select>
@@ -441,7 +469,7 @@ const UserWorkoutForm = () => {
                   />
                 </div>
               </div>
-              {type === "Løping" && (
+              {type === "Running" && (
                 <>
                   <div className="max-w-sm py-2">
                     <label
@@ -561,11 +589,43 @@ const UserWorkoutForm = () => {
         </Modal.Body>
       </Modal>
 
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          margin: "20px 0",
+        }}
+      >
+        {exportingWeeklyWorkout ? (
+          <Button
+            size="md"
+            isProcessing
+            processingSpinner={
+              <AiOutlineLoading className="h-6 w-6 animate-spin" />
+            }
+          >
+            Export Selected Week to Google Calendar
+          </Button>
+        ) : weeklyWorkoutExported ? (
+          <Button disabled>Exported</Button>
+        ) : weeklyWorkoutNotExported ? (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            Failed to export workouts
+          </Alert>
+        ) : user.isGoogleAuthenticated ? (
+          <Button onClick={() => exportWeekToGoogleCalendar()}>
+            Export Selected Week to Google Calendar
+          </Button>
+        ) : null}
+      </Box>
+
       <WeeklyRunningVolume
         client={user}
         week={currentWeek}
         workouts={workouts}
       />
+
       {user && !user.isGoogleAuthenticated && (
         <Box
           sx={{

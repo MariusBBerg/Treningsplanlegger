@@ -4,6 +4,7 @@ import com.treningsplanlegging.treningsplanlegging.dto.UserDto;
 import com.treningsplanlegging.treningsplanlegging.dto.WorkoutDto;
 import com.treningsplanlegging.treningsplanlegging.entity.User;
 import com.treningsplanlegging.treningsplanlegging.entity.Workout;
+import com.treningsplanlegging.treningsplanlegging.mappers.WorkoutMapper;
 import com.treningsplanlegging.treningsplanlegging.repository.UserRepository;
 import com.treningsplanlegging.treningsplanlegging.repository.WorkoutRepository;
 import com.treningsplanlegging.treningsplanlegging.service.WorkoutService;
@@ -15,7 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/workouts")
@@ -25,13 +32,15 @@ public class WorkoutController {
     private final UserRepository userRepository;
     private final UserService userService; 
     private final WorkoutRepository workoutRepository;
+    private final WorkoutMapper workoutMapper;
 
     @Autowired
-    public WorkoutController(WorkoutService workoutService, UserRepository userRepository, UserService userService, WorkoutRepository workoutRepository) {
+    public WorkoutController(WorkoutService workoutService, UserRepository userRepository, UserService userService, WorkoutRepository workoutRepository, WorkoutMapper workoutMapper) {
         this.workoutService = workoutService;
         this.userRepository = userRepository;
         this.userService = userService; 
         this.workoutRepository = workoutRepository;
+        this.workoutMapper = workoutMapper;
     }
 
     @PostMapping
@@ -104,7 +113,7 @@ public class WorkoutController {
         currentWorkout.setDescription(workoutDto.getDescription());
         currentWorkout.setDate(workoutDto.getDate());
         currentWorkout.setName(workoutDto.getName());
-        if ("Løping".equals(workoutDto.getType()) && workoutDto.getDistance() != null && workoutDto.getDurationSeconds() != null && workoutDto.getDistance() > 0 && workoutDto.getDurationSeconds() > 0 ) {
+        if ("Running".equals(workoutDto.getType()) && workoutDto.getDistance() != null && workoutDto.getDurationSeconds() != null && workoutDto.getDistance() > 0 && workoutDto.getDurationSeconds() > 0 ) {
             currentWorkout.setDistance(workoutDto.getDistance());
             currentWorkout.setDurationSeconds(workoutDto.getDurationSeconds());
             currentWorkout.setIntensityZone(workoutDto.getIntensityZone());
@@ -139,5 +148,33 @@ public ResponseEntity<?> deleteWorkout(@PathVariable Long id, @RequestParam Stri
     workoutService.deleteWorkout(id);
     return ResponseEntity.ok().build();
 }
+@GetMapping("/friends/workouts/upcoming")
+public ResponseEntity<List<WorkoutDto>> getFriends7UpcomingWorkouts() {
+    // Get the current user
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String login = authentication.getName();
+    User currentUser = userRepository.findByLogin(login)
+            .orElseThrow(() -> new RuntimeException("User not found with username: " + login));
+
+    // Get the top 7 upcoming workouts of each friend
+    List<WorkoutDto> allUpcomingWorkouts = new ArrayList<>();
+    for (User friend : currentUser.getFriends()) {
+        Date currentDate = java.sql.Date.valueOf(LocalDate.now());
+        List<Workout> friendWorkouts = workoutRepository.findTop7ByUserAndDateAfterOrderByDateAsc(friend, currentDate);
+        List<WorkoutDto> friendWorkoutDtos = friendWorkouts.stream()
+            .map(workoutMapper::toWorkoutDto)
+            .collect(Collectors.toList());
+        allUpcomingWorkouts.addAll(friendWorkoutDtos);
+    }
+
+    // Sort all workouts by date and limit to 7
+    List<WorkoutDto> upcomingWorkouts = allUpcomingWorkouts.stream()
+        .sorted(Comparator.comparing(WorkoutDto::getDate))
+        .limit(7)
+        .collect(Collectors.toList());
+
+    return ResponseEntity.ok(upcomingWorkouts);
+}
+
 
 }
