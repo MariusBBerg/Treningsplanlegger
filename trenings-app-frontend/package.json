@@ -25,6 +25,7 @@
     "dotenv": "^16.4.5",
     "flowbite-react": "^0.7.2",
     "formik": "^2.4.5",
+    "framer-motion": "^11.1.7",
     "net": "^1.0.2",
     "os-browserify": "^0.3.0",
     "path": "^0.12.7",

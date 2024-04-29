@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navigation from '../components/Navigation/Navigation';
 import UserWorkoutForm from '../components/Workout/UserWorkoutForm';
 import Footer from '../components/Footer';
+import ChatIconButton from '../components/Social/ChatIconButton';
 
 const DashBoard = () => {
   return (
@@ -18,6 +19,7 @@ const DashBoard = () => {
         </div>
         <Link to="/logout" className="text-red-600 hover:text-red-800 mt-4 transition duration-300 ease-in-out">Log out</Link>
       </div>
+      <ChatIconButton />
     <Footer />  
     </div>
   );
