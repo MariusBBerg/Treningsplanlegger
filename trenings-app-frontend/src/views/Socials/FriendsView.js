@@ -21,7 +21,6 @@ import Navigation from "../../components/Navigation/Navigation";
 import Footer from "../../components/Footer";
 import Grid from "@mui/material/Grid";
 import ChatIcon from "../../components/Social/ChatIconButton";
-import ChatIconButton from "../../components/Social/ChatIconButton";
 
 
 
@@ -426,7 +425,6 @@ const FriendsView = () => {
             </>
           </Grid>
         </Grid>
-        <ChatIconButton />
       </Container>
       <Footer />
     </div>

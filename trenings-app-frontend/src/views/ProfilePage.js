@@ -28,7 +28,6 @@ import revokeGoogleAccess from "../services/GoogleServices/revokeGoogleAccess";
 import authorizeGoogleOAuth from "../services/GoogleServices/authorizeGoogleOAuth";
 import FriendRequests from "./Socials/FriendsView";
 import FriendsModal from "../components/FriendsModal";
-import ChatIconButton from "../components/Social/ChatIconButton";
 
 export default function ProfilePage() {
   const [open, setOpen] = useState(false);
@@ -446,7 +445,6 @@ export default function ProfilePage() {
           {updateUserError}
         </Alert>
       </Snackbar>
-      <ChatIconButton />
       <Footer />
 
     </div>
