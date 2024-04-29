@@ -18,6 +18,7 @@ import OAuthCallback from "./components/Workout/Hooks/OAuthCallback.js";
 import PrivacyPolicy from "./views/PrivacyPolicy.js";
 import FriendsView from "./views/Socials/FriendsView.js";
 import HomeFeed from "./views/HomeFeed.js";
+import ChatRoom from "./views/Socials/ChatRoom.js";
 
 
 function App() {
@@ -69,6 +70,7 @@ function App() {
           <Route path="/logout" element={<Logout />} />
           <Route path="/googlecalendar/callback" element={<OAuthCallback />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/chat" element={<ProtectedRoute><ChatRoom  /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
