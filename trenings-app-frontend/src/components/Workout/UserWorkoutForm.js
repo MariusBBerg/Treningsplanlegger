@@ -185,7 +185,7 @@ const UserWorkoutForm = () => {
                 >
                   <option value="">Choose a type</option>
                   <option value="Running">Running</option>
-                  <option value="Styrke">Strength</option>
+                  <option value="Strength">Strength</option>
                   <option value="Cardio">General Cardio</option>
                 </Select>
                 <div className="max-w-sm py-2">
@@ -449,7 +449,7 @@ const UserWorkoutForm = () => {
                 >
                   <option value="">Choose a type</option>
                   <option value="Running">Running</option>
-                  <option value="Styrke">Strength</option>
+                  <option value="Strength">Strength</option>
                   <option value="Cardio">General Cardio</option>
                 </Select>
                 <div className="max-w-sm py-2">

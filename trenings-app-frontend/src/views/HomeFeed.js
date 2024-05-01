@@ -8,7 +8,6 @@ import {
   Container,
   Box,
   IconButton,
-  Tooltip,
   CircularProgress,
 } from "@mui/material";
 import { fetchWorkouts } from "../components/Workout/Hooks/workoutApi";
@@ -16,7 +15,9 @@ import { API_URL } from "../utils/api_url";
 import Navigation from "../components/Navigation/Navigation";
 import Footer from "../components/Footer";
 import moment from "moment";
-import { Refresh, RunCircle } from "@mui/icons-material";
+import { Refresh, RunCircle,FitnessCenter } from "@mui/icons-material";
+import MonitorHeartOutlinedIcon from '@mui/icons-material/MonitorHeartOutlined';
+
 
 const HomeFeed = () => {
   const [myWorkouts, setMyWorkouts] = useState([]);
@@ -53,7 +54,6 @@ const HomeFeed = () => {
     fetchWorkouts(null, user, setMyWorkouts);
     setTimeout(() => setIsRefreshing(false), 1500);
     setTimeout(() => setIsRefreshDisabled(false), 5000);
-    
   };
 
   return (
@@ -73,96 +73,103 @@ const HomeFeed = () => {
         </Box>
 
         <Grid container spacing={3} alignItems="stretch">
-        {!isRefreshing && (
-          <>
-          <Grid item xs={12} md={6}>
-            <Typography variant="h5" component="h3" gutterBottom>
-              My Upcoming Workouts
-            </Typography>
-            {myWorkouts.slice(0,7).map((workout) => (
-              <Card
-                sx={{
-                  mb: 3,
-                  background: "linear-gradient(to right, #e1f5fe, #b3e5fc)", 
-                }}
-              >
-                <CardContent>
-                  <Box
-                    display="flex"
-                    flexDirection="column"
-                    justifyContent="center"
-                    alignItems="center"
-                  >
-                    <Typography variant="h6">{workout.name}</Typography>
-                    <Typography variant="body1">
-                      <RunCircle /> {workout.type}
-                    </Typography>
-                    <Typography variant="body2">
-                      {workout.description || "No description provided"}
-                    </Typography>
-                    <Typography variant="body2">
-                      Date: {moment(workout.date).format("YYYY-MM-DD HH:mm")}
-                    </Typography>
-                    {workout.type === "Running" && (
-                      <>
-                        <Typography variant="body2">
-                          Distance: {workout.distance} km
-                        </Typography>
-                        <Typography variant="body2">
-                          Intensity Zone: {workout.intensityZone}
-                        </Typography>
-                      </>
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
-            ))}
-          </Grid>
+          {!isRefreshing && (
+            <>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h5" component="h3" gutterBottom>
+                  My Upcoming Workouts
+                </Typography>
+                {myWorkouts
+                  .filter((workout) => new Date(workout.date) > new Date())
+                  .sort((a, b) => new Date(a.date) - new Date(b.date))
+                  .slice(0, 7)
+                  .map((workout) => (
+                    <Card
+                      sx={{
+                        mb: 3,
+                        background:
+                          "linear-gradient(to right, #e1f5fe, #b3e5fc)",
+                      }}
+                    >
+                      <CardContent>
+                        <Box
+                          display="flex"
+                          flexDirection="column"
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          <Typography variant="h6">{workout.name}</Typography>
+                          <Typography variant="body1">
+                          {workout.type === 'Strength' ? <FitnessCenter /> : workout.type === 'Cardio' ? <MonitorHeartOutlinedIcon /> : <RunCircle />} {workout.type}
+                          </Typography>
+                          <Typography variant="body2">
+                            {workout.description || "No description provided"}
+                          </Typography>
+                          <Typography variant="body2">
+                            Date:{" "}
+                            {moment(workout.date).format("DD-MM-YYYY HH:mm")}
+                          </Typography>
+                          {workout.type === "Running" && (
+                            <>
+                              <Typography variant="body2">
+                                Distance: {workout.distance} km
+                              </Typography>
+                              <Typography variant="body2">
+                                Intensity Zone: {workout.intensityZone}
+                              </Typography>
+                            </>
+                          )}
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </Grid>
 
-          <Grid item xs={12} md={6}>
-            <Typography variant="h5" component="h3" gutterBottom>
-              Friends' Upcoming Workouts
-            </Typography>
-            {friendsWorkouts.map((workout) => (
-              <Card
-                sx={{
-                  mb: 3,
-                  background: "linear-gradient(to right, #e1f5fe, #b3e5fc)",
-                }}
-              >
-                <CardContent>
-                  <Box
-                    display="flex"
-                    flexDirection="column"
-                    justifyContent="center"
-                    alignItems="center"
+              <Grid item xs={12} md={6}>
+                <Typography variant="h5" component="h3" gutterBottom>
+                  Friends' Upcoming Workouts
+                </Typography>
+                {friendsWorkouts.map((workout) => (
+                  <Card
+                    sx={{
+                      mb: 3,
+                      background: "linear-gradient(to right, #e1f5fe, #b3e5fc)",
+                    }}
                   >
-                    <Typography variant="h6">
-                      {workout.name} - {workout.userLogin}
-                    </Typography>
-                    <Typography variant="body1">
-                      <RunCircle /> {workout.type}
-                    </Typography>
-                    <Typography variant="body2">
-                      Date: {moment(workout.date).format("YYYY-MM-DD HH:mm")}
-                    </Typography>
-                    {workout.type === "Running" && (
-                      <>
-                        <Typography variant="body2">
-                          Distance: {workout.distance} km
+                    <CardContent>
+                      <Box
+                        display="flex"
+                        flexDirection="column"
+                        justifyContent="center"
+                        alignItems="center"
+                      >
+                        <Typography variant="h6">
+                          {workout.name} - {workout.userLogin}
+                        </Typography>
+                        <Typography variant="body1">
+                        {workout.type === 'Strength' ? <FitnessCenter /> : workout.type === 'Cardio' ? <MonitorHeartOutlinedIcon /> : <RunCircle />} {workout.type}
                         </Typography>
                         <Typography variant="body2">
-                          Intensity Zone: {workout.intensityZone}
+                          Date:{" "}
+                          {moment(workout.date).format("YYYY-MM-DD HH:mm")}
                         </Typography>
-                      </>
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
-            ))}
-          </Grid>
-          </>
-        )}
+                        {workout.type === "Running" && (
+                          <>
+                            <Typography variant="body2">
+                              Distance: {workout.distance} km
+                            </Typography>
+                            <Typography variant="body2">
+                              Intensity Zone: {workout.intensityZone}
+                            </Typography>
+                          </>
+                        )}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Grid>
+            </>
+          )}
         </Grid>
       </Container>
       <Footer />

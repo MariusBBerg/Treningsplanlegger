@@ -28,6 +28,7 @@ const loggedInNavigation = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Profile", href: "/profile" },
   {name: "Friends", href: "/friends"},
+  {name:"Chat", href: "/chat"},
   { name: "Coach", href: "/coach" },
 
 ];

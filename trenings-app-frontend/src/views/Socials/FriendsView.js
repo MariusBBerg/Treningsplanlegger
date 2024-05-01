@@ -21,6 +21,8 @@ import Navigation from "../../components/Navigation/Navigation";
 import Footer from "../../components/Footer";
 import Grid from "@mui/material/Grid";
 
+
+
 const FriendsView = () => {
   const [requests, setRequests] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,7 +61,6 @@ const FriendsView = () => {
       console.error("Error searching users", error);
     }
   };
-
 
   useEffect(() => {
     if (searchTerm) {
@@ -218,7 +219,7 @@ const FriendsView = () => {
   return (
     <div className="theme-bg min-h-screen flex flex-col">
       <Navigation />
-      <Container sx={{ mt: 10, mb: 3 , flex:1}}>
+      <Container sx={{ mt: 10, mb: 3, flex: 1 }}>
         <Grid container spacing={2}>
           <Grid
             item
