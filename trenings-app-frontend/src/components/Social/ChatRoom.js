@@ -22,6 +22,7 @@ const ChatRoom = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [friends, setFriends] = useState([]);
   const [privateChats, setPrivateChats] = useState(new Map());
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     fetchFriends();
@@ -34,11 +35,16 @@ const ChatRoom = () => {
       }
     };
   }, []);
+
   useEffect(() => {
     if (receiver) {
       fetchMessages(receiver.id);
     }
   }, [receiver]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [privateChats]);
 
   const fetchFriends = async () => {
     const response = await axios.get(`${API_URL}api/users/me/friends`, {
@@ -46,9 +52,8 @@ const ChatRoom = () => {
     });
     setFriends(response.data);
     if (!receiver && response.data.length > 0) {
-        setReceiver(response.data[0]);
-      }
-    
+      setReceiver(response.data[0]);
+    }
   };
 
   const fetchMessages = async (receiverId) => {
@@ -67,6 +72,7 @@ const ChatRoom = () => {
       console.error("Error fetching messages:", error);
     }
   };
+
   const connect = () => {
     if (!stompClient) {
       const sock = new SockJS(`${API_URL}ws`);
@@ -126,86 +132,114 @@ const ChatRoom = () => {
   };
 
   return (
-    <Box sx={{ display: "flex", height: "80vh", backgroundColor: grey[100] }}>
-      <Box sx={{ width: "30%", borderRight: `1px solid ${grey[300]}` }}>
-        <Typography variant="h6" sx={{ my: 2, mx: 2 }}>
-          Chats
-        </Typography>
-        <List>
-          {friends.map((friend) => (
-            <ListItem
-              button
-              key={friend.login}
-              onClick={() => setReceiver(friend)}
-              style={{
-                backgroundColor:
-                  receiver === friend ? "lightgray" : "transparent",
-              }}
-            >
-              <ListItemAvatar>
-                <Avatar>{friend.login[0].toUpperCase()}</Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={friend.login} />
-            </ListItem>
-          ))}
-        </List>
-      </Box>
-      <Box sx={{ width: "70%", display: "flex", flexDirection: "column" }}>
-        <Paper sx={{ flex: 1, overflow: "auto", m: 2, p: 2 }}>
-          {privateChats.get(receiver?.login)?.map((message, index) => (
-            <Box
-              key={index}
-              sx={{
-                display: "flex",
-                justifyContent:
-                  message.sender.login === user.login
-                    ? "flex-end"
-                    : "flex-start",
-                mb: 1,
-              }}
-            >
-              <Paper
-                sx={{
-                  p: 1,
-                  bgcolor:
-                    message.sender.login === user.login
-                      ? "primary.main"
-                      : grey[300],
+    <>
+      <style>
+        {`
+#scrollbar1::-webkit-scrollbar {
+  width: 12px;
+}
+
+#scrollbar1::-webkit-scrollbar-track {
+  border-radius: 8px;
+  background-color: #95a5a6;
+  border: 1px solid #cacaca;
+}
+
+#scrollbar1::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: #2c3e50;
+}
+        `}
+      </style>
+      <Box
+        sx={{
+          display: "flex",
+          height: "80vh",
+          backgroundColor: grey[100],
+          overflowY: "hidden",
+        }}
+      >
+        <Box sx={{ width: "30%", borderRight: `1px solid ${grey[300]}` }}>
+          <Typography variant="h6" sx={{ my: 2, mx: 2 }}>
+            Chats
+          </Typography>
+          <List>
+            {friends.map((friend) => (
+              <ListItem
+                button
+                key={friend.login}
+                onClick={() => setReceiver(friend)}
+                style={{
+                  backgroundColor:
+                    receiver === friend ? "lightgray" : "transparent",
                 }}
               >
-                <Typography
-                  variant="caption"
-                  sx={{ display: "block", color: "text.secondary" }}
+                <ListItemAvatar>
+                  <Avatar>{friend.login[0].toUpperCase()}</Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={friend.login} />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+        <Box sx={{ width: "70%", display: "flex", flexDirection: "column" }}>
+          <Paper id="scrollbar1" sx={{ flex: 1, overflow: "auto", m: 2, p: 2 }}>
+            {privateChats.get(receiver?.login)?.map((message, index) => (
+              <Box
+                key={index}
+                sx={{
+                  display: "flex",
+                  justifyContent:
+                    message.sender.login === user.login
+                      ? "flex-end"
+                      : "flex-start",
+                  mb: 1,
+                }}
+              >
+                <Paper
+                  sx={{
+                    p: 1,
+                    bgcolor:
+                      message.sender.login === user.login
+                        ? "primary.main"
+                        : grey[300],
+                  }}
                 >
-                  {message.sender.login}
-                </Typography>
-                <Typography variant="body2">{message.message}</Typography>
-              </Paper>
-            </Box>
-          ))}
-        </Paper>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            p: 1,
-            borderTop: `1px solid ${grey[300]}`,
-          }}
-        >
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Type a message..."
-            value={message}
-            onChange={handleMessage}
-            sx={{ mr: 1 }}
-          />
-          <Button variant="contained" onClick={sendPrivateMessage}>
-            Send
-          </Button>
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "block", color: "text.secondary" }}
+                  >
+                    {message.sender.login}
+                  </Typography>
+                  <Typography variant="body2">{message.message}</Typography>
+                </Paper>
+              </Box>
+            ))}
+            <div ref={messagesEndRef} />
+          </Paper>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              p: 1,
+              borderTop: `1px solid ${grey[300]}`,
+            }}
+          >
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Type a message..."
+              value={message}
+              onChange={handleMessage}
+              sx={{ mr: 1 }}
+            />
+            <Button variant="contained" onClick={sendPrivateMessage}>
+              Send
+            </Button>
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

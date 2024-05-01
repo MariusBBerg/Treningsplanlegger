@@ -20,7 +20,6 @@ import { API_URL } from "../../utils/api_url";
 import Navigation from "../../components/Navigation/Navigation";
 import Footer from "../../components/Footer";
 import Grid from "@mui/material/Grid";
-import ChatIcon from "../../components/Social/ChatIconButton";
 
 
 
