@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useEffect } from "react";
+import React, { useEffect,useState } from "react";
 import { BrowserRouter, Routes, Route,useLocation } from "react-router-dom";
 import HomePage from "./views/HomePage";
 import LoginForm from "./views/Authentication/LoginForm.js";
@@ -20,15 +20,25 @@ import FriendsView from "./views/Socials/FriendsView.js";
 import HomeFeed from "./views/HomeFeed.js";
 import ChatView from "./views/Socials/ChatView.js";
 import PageTransition from './PageTransition'; 
+import CircularProgress from "@mui/material/CircularProgress";
+
 
 
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true); // Track whether auth check is loading
+
   useEffect(() => {
     document.title = "Treningsplanleggeren";
 
-    checkAuth(); // Sjekk tokenet ved første lasting
+    checkAuth()
+      .then(() => setIsLoading(false)) // Set loading to false after auth check
+      .catch(() => setIsLoading(false)); // Also set to false on error, handle accordingly
   }, []);
+
+  if (isLoading) {
+    return <div><CircularProgress  /></div>; // Or any other loading indicator
+  }
  
 
   return (

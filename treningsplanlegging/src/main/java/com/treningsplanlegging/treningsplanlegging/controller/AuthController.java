@@ -53,8 +53,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
+    public ResponseEntity<?> refreshToken(@RequestBody String refreshToken) {
 
         if (userAuthenticationProvider.isTokenExpired(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token is expired");
@@ -62,6 +61,7 @@ public class AuthController {
 
         Authentication authentication = userAuthenticationProvider.validateToken(refreshToken);
         if (authentication == null) {
+            System.out.println("Invalid refresh token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
         }
 
